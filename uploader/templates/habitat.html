@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Habitat and Urbanization</h3>
+<form method="POST">
+    <div class="mb-3">
+        <label for="mainHabitat" class="form-label">Setting Type</label>
+        <select id="mainHabitat" name="mainHabitat" class="form-select" onchange="updateSubOptions()" required>
+            <option value="">-- Select Setting --</option>
+            <option value="urban">Urban</option>
+            <option value="suburban">Suburban</option>
+            <option value="rural">Rural</option>
+            <option value="wild">Wild</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="subHabitat" class="form-label">Specific Habitat</label>
+        <select id="subHabitat" name="subHabitat" class="form-select" required>
+            <option value="">-- Select Sub-Habitat --</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
+
+<script>
+    const subOptions = {
+        "urban": ["Home lawn", "Garden", "Other"],
+        "suburban": ["Home lawn", "Garden", "Other"],
+        "rural": ["Plantation forest", "Natural field or meadow", "Home lawn", "Garden", "Other"],
+        "wild": ["Deciduous forest", "Wild forest", "Evergreen forest", "Other"]
+    };
+
+    function updateSubOptions() {
+        const mainSelect = document.getElementById("mainHabitat");
+        const subSelect = document.getElementById("subHabitat");
+
+        const selectedMain = mainSelect.value;
+        subSelect.innerHTML = '<option value="">-- Select Sub-Habitat --</option>';
+
+        if (selectedMain && subOptions[selectedMain]) {
+            subOptions[selectedMain].forEach(opt => {
+                let option = document.createElement("option");
+                option.value = opt;
+                option.text = opt;
+                subSelect.appendChild(option);
+            });
+        }
+    }
+</script>
+{% endblock %}

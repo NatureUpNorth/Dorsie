@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>{{ affiliation_type }} Affiliation</h3>
+<form method="POST">
+    <input type="hidden" name="affiliation_type" value="{{ affiliation_type }}">
+
+    {% if affiliation_type == 'University' %}
+        {% for uni in ['St. Lawrence', 'Clarkson', 'SUNY Canton'] %}
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="sub_affiliation" value="{{ uni }}" required>
+            <label class="form-check-label">{{ uni }}</label>
+        </div>
+        {% endfor %}
+    {% elif affiliation_type == 'School' %}
+        {% for school in ['Canton Central', 'Colton-Pierrepont Central School', 'Little River Community School', 'Massena Central School'] %}
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="sub_affiliation" value="{{ school }}" required>
+            <label class="form-check-label">{{ school }}</label>
+        </div>
+        {% endfor %}
+    {% else %}
+        <label class="form-label">Enter Affiliation Name:</label>
+        <input type="text" class="form-control" name="sub_affiliation" required>
+    {% endif %}
+
+    <br>
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
+{% endblock %}

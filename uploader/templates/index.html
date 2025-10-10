@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block content %}
+<!--<h3>Upload Image</h3>-->
+<!--<form method="POST" enctype="multipart/form-data">-->
+<!--    <div class="mb-3">-->
+<!--        <label for="image" class="form-label">Choose Image</label>-->
+<!--        <input type="file" name="image" class="form-control" required>-->
+<!--    </div>-->
+<!--    <button type="submit" class="btn btn-primary">Next</button>-->
+
+<!--<!doctype html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--<meta charset="UTF-8">-->
+<!--<title>Nature Up North Uploader</title>-->
+<!--</head>-->
+<!--<body>-->
+<h1>Nature Up North Uploader</h1>
+<p>Submit your images here.</p>
+
+<!-- Show flash messages -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul style="color: green;">
+{% for message in messages %}
+<li>{{ message }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<!-- Upload form, action=/ sends files to the flask /upload route -->
+<!-- multipart/form-data lets file data be sent -->
+<form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+
+<!-- Drag and drop area -->
+<div id="drop-area" style="border:2px dashed #ccc; padding:30px; text-align:center; margin-bottom:10px;">
+<p>Drag & drop files here or</p>
+<input type="file" webkitdirectory id="fileElem" name="file" style="display:none" multiple accept="image/*,video/*,audio/*" onchange="handleFiles(this.files)">
+<!-- Progress Bar -->
+<progress id="upload-progress" value="0" max="100"style="width:100%; display:none;"> </progress>
+
+<!-- Button to open the file -->
+<button type="button" onclick="document.getElementById('fileElem').click();">Select Files</button>
+</div>
+
+<!-- List of files to be uploaded-->
+<div id="file-list"></div>
+<button type="submit">Upload</button>
+</form>
+
+<!-- JavaScript -->
+<script>
+// get page elements
+let dropArea = document.getElementById('drop-area');
+let fileList = document.getElementById('file-list');
+let filesToUpload = [];
+
+// highlight area when dragging files over it
+dropArea.addEventListener('dragover', (e) => {
+e.preventDefault();
+dropArea.style.background = '#eee';
+});
+
+// remove highlight when not dragging over
+dropArea.addEventListener('dragleave', (e) => {
+e.preventDefault();
+dropArea.style.background = '';
+});
+
+// handle dropped files
+dropArea.addEventListener('drop', (e) => {
+e.preventDefault();
+dropArea.style.background = '';
+handleFiles(e.dataTransfer.files);
+});
+
+// show selected files in a list with remove buttons
+function renderFileList() {
+fileList.innerHTML = '';
+filesToUpload.forEach((f, idx) => {
+let row = document.createElement('div');
+row.style.display = 'flex';
+row.style.justifyContent = 'space-between';
+row.style.alignItems = 'center';
+row.style.padding = '4px 0';
+let name = document.createElement('span');
+name.textContent = f.webkitRelativePath || f.name;
+let removeBtn = document.createElement('button');
+removeBtn.type = 'button';
+removeBtn.textContent = 'Remove';
+removeBtn.onclick = () => {
+filesToUpload.splice(idx, 1);
+syncInputFiles();
+renderFileList();
+};
+row.appendChild(name);
+row.appendChild(removeBtn);
+fileList.appendChild(row);
+});
+}
+
+// copies all files from filesToUpload array to the hidden file input
+// so they get submitted with the form
+function syncInputFiles() {
+let input = document.getElementById('fileElem');
+let dt = new DataTransfer();
+filesToUpload.forEach(f => dt.items.add(f));
+input.files = dt.files;
+}
+
+// add new files and refresh list
+function handleFiles(files) {
+// When adding, keep existing files (allow multiple drags)
+filesToUpload = filesToUpload.concat(Array.from(files));
+renderFileList();
+syncInputFiles();
+}
+
+// start of progress bar implementation
+// Intercept the form submission
+document.getElementById('upload-form').addEventListener('submit', function(e) {
+e.preventDefault(); // Stop the normal page reload
+
+const progressBar = document.getElementById('upload-progress');
+progressBar.style.display = 'block';
+progressBar.value = 0;
+
+const formData = new FormData();
+filesToUpload.forEach(f => formData.append('file', f));
+
+const xhr = new XMLHttpRequest();
+xhr.open('POST', '/upload', true);
+
+// Update progress bar as upload progresses
+xhr.upload.onprogress = function(event) {
+if (event.lengthComputable) {
+const percent = (event.loaded / event.total) * 100;
+progressBar.value = percent;
+}
+};
+
+// When upload is finished
+xhr.onload = function() {
+if (xhr.status === 200) {
+progressBar.value = 100;
+alert('Upload complete!');
+filesToUpload = [];
+renderFileList();
+progressBar.style.display = 'none';
+} else {
+alert('Upload failed. Try again.');
+progressBar.style.display = 'none';
+}
+};
+
+xhr.send(formData);
+});
+// end of progress bar implementation
+
+</script>
+<!--</body>-->
+<!--</html>-->
+
+</form>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Deployment Date</h3>
+<form method="POST">
+    <div class="mb-3">
+        <label for="date" class="form-label">Deployment Date</label>
+        <input type="date" name="date" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
+{% endblock %}
