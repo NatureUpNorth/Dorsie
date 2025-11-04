@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Multi-Step Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+     <style>
+        #map { height: 400px; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Image</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('affiliation') }}">Affiliation</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('habitat') }}">Habitat</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('dates') }}">Date</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('location') }}">Location</a></li>
+    </ul>
+    <h3> Location </h3>
+    <div id="map"></div>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+    </script>
+
+    <p id="latlon"> Select your location by clicking on the map </p>
+    <p id="submit"> SAVE COORDINATES </p>
+
+
+    <script>
+        const latlon = document.getElementById("latlon")
+        var map = L.map('map').setView([44.597, -75.168], 10);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+
+        var marker = L.marker();
+        var popup = L.popup();
+        var lat;
+        var lan;
+
+        function onMapClick(e) {
+            marker.setLatLng(e.latlng);
+            marker.addTo(map);
+            lat = e.latlng.lat;
+            lan = e.latlng.lng;
+            latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
+
+            //popup
+            //    .setLatLng(e.latlng)
+            //    .setContent("You clicked the map at " + e.latlng.toString())
+            //    .openOn(map);
+        }
+
+        var button = document.getElementById('submit');
+
+        function saveLocation() {
+            alert('Coordinates saved successfully!');
+            // Using Fetch API
+            fetch('/save_coordinates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ latitude: lat, longitude: lan})
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        map.on('click', onMapClick);
+        button.addEventListener('click', saveLocation);
+
+        // Example using a hidden form and submitting via GET
+        // This would typically be inside a popup or a dedicated form
+        var formUrl = `/save_coordinates?latitude=${lat}&longitude=${lng}`;
+        // You could then redirect or use this URL in an anchor tag
+        // For a POST request, you'd need a form element and submit it
+    </script>
+
+
+
+
+
+</body>
+</html>
