@@ -1,166 +1,332 @@
-{% extends 'base.html' %}
-{% block content %}
-<!--<h3>Upload Image</h3>-->
-<!--<form method="POST" enctype="multipart/form-data">-->
-<!--    <div class="mb-3">-->
-<!--        <label for="image" class="form-label">Choose Image</label>-->
-<!--        <input type="file" name="image" class="form-control" required>-->
-<!--    </div>-->
-<!--    <button type="submit" class="btn btn-primary">Next</button>-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Nature Up North</title>
 
-<!--<!doctype html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--<meta charset="UTF-8">-->
-<!--<title>Nature Up North Uploader</title>-->
-<!--</head>-->
-<!--<body>-->
+    <style>
+        body { font-family: Arial, sans-serif; }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            background: #eee;
+            padding: 12px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .tab.active {
+            border-bottom: 3px solid green;
+            font-weight: bold;
+        }
+
+        .tab.error {
+            border-bottom: 3px solid red !important;
+            color: red;
+            font-weight: bold;
+        }
+
+        .section {
+            display: none;
+            margin-top: 20px;
+        }
+        .section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
 <h1>Nature Up North Uploader</h1>
-<p>Submit your images here.</p>
 
-<!-- Show flash messages -->
+<!-- Flash messages -->
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul style="color: green;">
-{% for message in messages %}
-<li>{{ message }}</li>
-{% endfor %}
+    {% for msg in messages %}
+        <li>{{ msg }}</li>
+    {% endfor %}
 </ul>
 {% endif %}
 {% endwith %}
 
-<!-- Upload form, action=/ sends files to the flask /upload route -->
-<!-- multipart/form-data lets file data be sent -->
-<form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
 
-<!-- Drag and drop area -->
-<div id="drop-area" style="border:2px dashed #ccc; padding:30px; text-align:center; margin-bottom:10px;">
-<p>Drag & drop files here or</p>
-<input type="file" webkitdirectory id="fileElem" name="file" style="display:none" multiple accept="image/*,video/*,audio/*" onchange="handleFiles(this.files)">
-<!-- Progress Bar -->
-<progress id="upload-progress" value="0" max="100"style="width:100%; display:none;"> </progress>
-
-<!-- Button to open the file -->
-<button type="button" onclick="document.getElementById('fileElem').click();">Select Files</button>
+<!-- TABS -->
+<div class="tabs">
+    <div class="tab active" data-target="upload">Upload</div>
+    <div class="tab" data-target="affiliation">Affiliation</div>
+    <div class="tab" data-target="habitat">Habitat</div>
+    <div class="tab" data-target="dates">Date</div>
+    <div class="tab" data-target="location">Location</div>
 </div>
 
-<!-- List of files to be uploaded-->
-<div id="file-list"></div>
-<button type="submit">Upload</button>
+
+<!-- All tabs appear in one form, one URL -->
+<form action="/submit_all" method="POST" enctype="multipart/form-data">
+
+    <!-- Upload Section -->
+    <div id="upload" class="section active">
+        <h2>Upload Files</h2>
+        <input type="file" name="file" multiple required>
+    </div>
+
+
+    <!-- Affiliation Section -->
+    <div id="affiliation" class="section">
+        <h4>Affiliation</h4>
+
+        <!-- MAIN AFFILIATION -->
+        <div class="mb-3">
+            <label class="form-label">Affiliation Type</label>
+            <select class="form-select" id="affiliation_type" name="affiliation_type" required>
+                <option value="" disabled selected>Select affiliation</option>
+                <option value="University">University</option>
+                <option value="School">School</option>
+                <option value="Government">Government</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <!-- SUB-AFFILIATION: always enabled (2nd dropdown list) -->
+        <div class="mb-3" id="subAffiliationContainer">
+            <label class="form-label">Sub-Affiliation</label>
+            <input type="text" class="form-control" id="sub_affiliation"
+                   name="sub_affiliation" placeholder="Select affiliation first" required>
+        </div>
+    </div>
+
+
+    <!-- Habitat Section -->
+    <div id="habitat" class="section">
+        <h2>Habitat</h2>
+
+        <!-- MAIN HABITAT -->
+        <div class="mb-3">
+            <label class="form-label">Urbanization Level</label>
+            <select class="form-select" id="mainHabitat" name="mainHabitat" required>
+                <option value="" disabled selected>Select habitat type</option>
+                <option value="urban">Urban</option>
+                <option value="suburban">Suburban</option>
+                <option value="rural">Rural</option>
+                <option value="wild">Wild</option>
+            </select>
+        </div>
+
+        <!-- SUB-HABITAT WILL ALWAYS BE ENABLED (the 2nd dropdown list) -->
+        <div class="mb-3">
+            <label class="form-label">Sub-Habitat</label>
+            <select class="form-select" id="subHabitat" name="subHabitat" required>
+                <option value="" disabled selected>Select a main habitat first</option>
+            </select>
+        </div>
+    </div>
+
+
+    <!-- Date Section -->
+    <div id="dates" class="section">
+        <h2>Deployment Dates</h2>
+
+        <div class="mb-3">
+            <label class="form-label">Start of Camera Deployment</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">End of Camera Deployment</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" required>
+            <div id="dateError" style="color:red; display:none; margin-top:5px;">
+                ! End date cannot be before start date.
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Location Section -->
+    <div class="tab">
+        <a href="/location" style="text-decoration:none; color:inherit;">Location</a>
+    </div>
+
+
+    <br><br>
+    <button type="submit" id="submitAll">Submit All</button>
+
 </form>
 
-<!-- JavaScript -->
+
+<!-- TAB SWITCHING -->
 <script>
-// get page elements
-let dropArea = document.getElementById('drop-area');
-let fileList = document.getElementById('file-list');
-let filesToUpload = [];
+document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
 
-// highlight area when dragging files over it
-dropArea.addEventListener('dragover', (e) => {
-e.preventDefault();
-dropArea.style.background = '#eee';
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+        document.getElementById(tab.dataset.target).classList.add("active");
+    });
 });
-
-// remove highlight when not dragging over
-dropArea.addEventListener('dragleave', (e) => {
-e.preventDefault();
-dropArea.style.background = '';
-});
-
-// handle dropped files
-dropArea.addEventListener('drop', (e) => {
-e.preventDefault();
-dropArea.style.background = '';
-handleFiles(e.dataTransfer.files);
-});
-
-// show selected files in a list with remove buttons
-function renderFileList() {
-fileList.innerHTML = '';
-filesToUpload.forEach((f, idx) => {
-let row = document.createElement('div');
-row.style.display = 'flex';
-row.style.justifyContent = 'space-between';
-row.style.alignItems = 'center';
-row.style.padding = '4px 0';
-let name = document.createElement('span');
-name.textContent = f.webkitRelativePath || f.name;
-let removeBtn = document.createElement('button');
-removeBtn.type = 'button';
-removeBtn.textContent = 'Remove';
-removeBtn.onclick = () => {
-filesToUpload.splice(idx, 1);
-syncInputFiles();
-renderFileList();
-};
-row.appendChild(name);
-row.appendChild(removeBtn);
-fileList.appendChild(row);
-});
-}
-
-// copies all files from filesToUpload array to the hidden file input
-// so they get submitted with the form
-function syncInputFiles() {
-let input = document.getElementById('fileElem');
-let dt = new DataTransfer();
-filesToUpload.forEach(f => dt.items.add(f));
-input.files = dt.files;
-}
-
-// add new files and refresh list
-function handleFiles(files) {
-// When adding, keep existing files (allow multiple drags)
-filesToUpload = filesToUpload.concat(Array.from(files));
-renderFileList();
-syncInputFiles();
-}
-
-// start of progress bar implementation
-// Intercept the form submission
-document.getElementById('upload-form').addEventListener('submit', function(e) {
-e.preventDefault(); // Stop the normal page reload
-
-const progressBar = document.getElementById('upload-progress');
-progressBar.style.display = 'block';
-progressBar.value = 0;
-
-const formData = new FormData();
-filesToUpload.forEach(f => formData.append('file', f));
-
-const xhr = new XMLHttpRequest();
-xhr.open('POST', '/upload', true);
-
-// Update progress bar as upload progresses
-xhr.upload.onprogress = function(event) {
-if (event.lengthComputable) {
-const percent = (event.loaded / event.total) * 100;
-progressBar.value = percent;
-}
-};
-
-// When upload is finished
-xhr.onload = function() {
-if (xhr.status === 200) {
-progressBar.value = 100;
-alert('Upload complete!');
-filesToUpload = [];
-renderFileList();
-progressBar.style.display = 'none';
-} else {
-alert('Upload failed. Try again.');
-progressBar.style.display = 'none';
-}
-};
-
-xhr.send(formData);
-});
-// end of progress bar implementation
-
 </script>
-<!--</body>-->
-<!--</html>-->
 
-</form>
-{% endblock %}
+
+<!-- SUBMIT VALIDATION -->
+<script>
+document.getElementById("submitAll").addEventListener("click", function (event) {
+    event.preventDefault();
+
+    const tabs = document.querySelectorAll(".tab");
+    const sections = document.querySelectorAll(".section");
+
+    let firstInvalidTab = null;
+    let formIsValid = true;
+
+    tabs.forEach(tab => tab.classList.remove("error"));
+
+    sections.forEach(section => {
+        const requiredFields = section.querySelectorAll("[required]");
+        let sectionValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value) {
+                sectionValid = false;
+                formIsValid = false;
+            }
+        });
+
+        if (!sectionValid) {
+            const tab = document.querySelector(`.tab[data-target="${section.id}"]`);
+            tab.classList.add("error");
+
+            if (!firstInvalidTab) firstInvalidTab = tab;
+        }
+    });
+
+    if (!formIsValid) {
+        firstInvalidTab.click();
+        return;
+    }
+
+    event.target.closest("form").submit();
+});
+</script>
+
+
+<!-- AFFILIATION DROPDOWN -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const affiliationSelect = document.getElementById("affiliation_type");
+    const subContainer = document.getElementById("subAffiliationContainer");
+
+    const options = {
+        "University": ["St. Lawrence", "Clarkson", "SUNY Canton"],
+        "School": [
+            "Canton Central",
+            "Colton-Pierrepont Central School",
+            "Little River Community School",
+            "Massena Central School"
+        ]
+    };
+
+    affiliationSelect.addEventListener("change", function () {
+        const selected = this.value;
+
+        if (options[selected]) {
+            subContainer.innerHTML = `
+                <label class="form-label">Sub-Affiliation</label>
+                <select class="form-select" id="sub_affiliation" name="sub_affiliation" required>
+                    <option value="" disabled selected>Select sub-affiliation</option>
+                </select>
+            `;
+
+            const sel = document.getElementById("sub_affiliation");
+
+            options[selected].forEach(opt => {
+                const o = document.createElement("option");
+                o.value = opt;
+                o.textContent = opt;
+                sel.appendChild(o);
+            });
+        }
+        else {
+            subContainer.innerHTML = `
+                <label class="form-label">Sub-Affiliation</label>
+                <input type="text" class="form-control" id="sub_affiliation"
+                       name="sub_affiliation" placeholder="Enter affiliation name" required>
+            `;
+        }
+    });
+
+});
+</script>
+
+
+<!-- HABITAT DROPDOWN -->
+<script>
+const mainHabitat = document.getElementById("mainHabitat");
+const subHabitatSelect = document.getElementById("subHabitat");
+
+const subHabitats = [
+    "Deciduous Forest",
+    "Mixed Forest",
+    "Evergreen Forest",
+    "Plantation Forest",
+    "Natural Field or Meadow (Old Field)",
+    "Agricultural Field",
+    "Public Park/School Grounds",
+    "Home Lawn",
+    "Garden",
+    "Wetland Edge",
+    "Edge Between Two Habitats",
+    "Other"
+];
+
+mainHabitat.addEventListener("change", function () {
+
+    subHabitatSelect.innerHTML = "";
+
+    const defaultOpt = document.createElement("option");
+    defaultOpt.value = "";
+    defaultOpt.textContent = "Select sub-habitat";
+    defaultOpt.disabled = true;
+    defaultOpt.selected = true;
+    subHabitatSelect.appendChild(defaultOpt);
+
+    subHabitats.forEach(hab => {
+        const o = document.createElement("option");
+        o.value = hab;
+        o.textContent = hab;
+        subHabitatSelect.appendChild(o);
+    });
+});
+</script>
+
+
+<!-- DATE VALIDATION -->
+<script>
+const startDate = document.getElementById("start_date");
+const endDate = document.getElementById("end_date");
+const dateError = document.getElementById("dateError");
+
+function validateDates() {
+
+    if (!startDate.value || !endDate.value) {
+        dateError.style.display = "none";
+        return;
+    }
+
+    if (endDate.value < startDate.value) {
+        dateError.style.display = "block";
+    } else {
+        dateError.style.display = "none";
+    }
+}
+
+startDate.addEventListener("change", validateDates);
+endDate.addEventListener("change", validateDates);
+</script>
+
+</body>
+</html>
