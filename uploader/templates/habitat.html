@@ -1,51 +1,80 @@
 {% extends 'base.html' %}
 {% block content %}
 <h3>Habitat and Urbanization</h3>
-<form method="POST">
-    <div class="mb-3">
-        <label for="mainHabitat" class="form-label">Setting Type</label>
-        <select id="mainHabitat" name="mainHabitat" class="form-select" onchange="updateSubOptions()" required>
-            <option value="">-- Select Setting --</option>
-            <option value="urban">Urban</option>
-            <option value="suburban">Suburban</option>
-            <option value="rural">Rural</option>
-            <option value="wild">Wild</option>
-        </select>
-    </div>
 
-    <div class="mb-3">
-        <label for="subHabitat" class="form-label">Specific Habitat</label>
-        <select id="subHabitat" name="subHabitat" class="form-select" required>
-            <option value="">-- Select Sub-Habitat --</option>
-        </select>
-    </div>
+<div style="display: flex; justify-content: left">
+    <form method = "POST" style="padding: 40px;">
+        <h5> Habitat </h5>
+         <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="deciduous forest" required>
+            <label class="form-check-label">Deciduous Forest</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="mixed forest" required>
+            <label class="form-check-label">Mixed Forest</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="evergreen forest" required>
+            <label class="form-check-label">Evergreen Forest</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="plantation forest" required>
+            <label class="form-check-label">Plantation Forest</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="natural field" required>
+            <label class="form-check-label">Natural Field or Meadow (Old Field)</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="agricultural field" required>
+            <label class="form-check-label">Agricultural Field</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="public park/school grounds" required>
+            <label class="form-check-label">Public Park/School Grounds</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="home lawn" required>
+            <label class="form-check-label">Home Lawn</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="garden" required>
+            <label class="form-check-label">Garden</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="wetland edge" required>
+            <label class="form-check-label">Wetland Edge</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="edge between two habitats" required>
+            <label class="form-check-label">Edge Between Two Habitats</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habitat" value="other" required>
+            <label class="form-check-label">Other</label>
+        </div>
+    </form>
 
-    <button type="submit" class="btn btn-primary">Next</button>
-</form>
+    <form method = "POST" style="padding: 40px;">
+    <h5> Urbanization </h5>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
+            <label class="form-check-label">Urban</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="urbanization" value="suburban">
+            <label class="form-check-label">Suburban</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="urbanization" value="rural">
+            <label class="form-check-label">Rural</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="urbanization" value="wild">
+            <label class="form-check-label">Wild</label>
+        </div>
+    </form>
+</div>
+    <button type="submit" class="btn btn-primary">Set Habitat</button>
 
-<script>
-    const subOptions = {
-        "urban": ["Home lawn", "Garden", "Other"],
-        "suburban": ["Home lawn", "Garden", "Other"],
-        "rural": ["Plantation forest", "Natural field or meadow", "Home lawn", "Garden", "Other"],
-        "wild": ["Deciduous forest", "Wild forest", "Evergreen forest", "Other"]
-    };
-
-    function updateSubOptions() {
-        const mainSelect = document.getElementById("mainHabitat");
-        const subSelect = document.getElementById("subHabitat");
-
-        const selectedMain = mainSelect.value;
-        subSelect.innerHTML = '<option value="">-- Select Sub-Habitat --</option>';
-
-        if (selectedMain && subOptions[selectedMain]) {
-            subOptions[selectedMain].forEach(opt => {
-                let option = document.createElement("option");
-                option.value = opt;
-                option.text = opt;
-                subSelect.appendChild(option);
-            });
-        }
-    }
-</script>
 {% endblock %}
