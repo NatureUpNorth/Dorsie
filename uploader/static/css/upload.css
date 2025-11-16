@@ -1,0 +1,36 @@
+/* drag and drop area */
+#drop-area {
+    border: 2px dashed #ccc;
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 10px;
+    transition: 0.3s ease;
+}
+
+/* highlight when dragging */
+#drop-area.dragover {
+    background: #eee;
+}
+
+/* flash messages */
+.flash-messages {
+    color: green;
+    list-style: none;
+    padding-left: 0;
+}
+
+.flash-messages li {
+    margin-bottom: 4px;
+}
+
+/* file list row */
+#file-list div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+#file-list button {
+    margin-left: 10px;
+}

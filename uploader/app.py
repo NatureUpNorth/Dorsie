@@ -75,51 +75,46 @@ def allowed_file(filename):
 # home page route
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    return render_template('upload.html')
 
 
 # upload route, only works with POST requests,  POST requests are used for sending data to the server
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['GET','POST'])
 def upload():
-    # check if the form/request has the file part
-    if 'file' not in request.files:
-        flash('No file part')
+    if request.method == 'POST':
+        # check if the form/request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(url_for('index'))
+
+        # get a list of files from the request
+        files = request.files.getlist('file')
+
+        # make sure at least one file was selected
+        if not files or files[0].filename == '':
+            flash('No selected file')
+            return redirect(url_for('index'))
+
+        # create upload folder if it doesn't exist
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+        skipped = []
+
+        # save each uploaed file to the upload folder
+        for file in files:
+            if file and file.filename:
+                # clean and simplify the filename to make it secure
+                fname = secure_filename(os.path.basename(file.filename))
+                if not fname:
+                    continue
+                # only save files with allowed extensions
+                if allowed_file(fname):
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))          
+        # show success message and redirect to home page
+        flash('Files uploaded successfully!')
         return redirect(url_for('index'))
 
-    # get a list of files from the request
-    files = request.files.getlist('file')
-
-    # make sure at least one file was selected
-    if not files or files[0].filename == '':
-        flash('No selected file')
-        return redirect(url_for('index'))
-
-    # create upload folder if it doesn't exist
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-    skipped = []
-
-    # save each uploaed file to the upload folder
-    for file in files:
-        if file and file.filename:
-            # clean and simplify the filename to make it secure
-            fname = secure_filename(os.path.basename(file.filename))
-            if not fname:
-                continue
-            # only save files with allowed extensions
-            if allowed_file(fname):
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))
-            else:
-                skipped.append(fname)
-
-    if skipped:
-        flash(f'Skipped files with unsupported extensions: {", ".join(skipped)}')
-    else:
-        flash('All files uploaded successfully!')
-
-    # show success message and redirect to home page
-    flash('Files uploaded successfully!')
-    return redirect(url_for('index'))
+    return render_template('upload.html')
 
 # @app.route('/index', methods=['GET', 'POST'])
 # def index():

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Link to CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+
+<!-- Page Title -->
+<h1>Nature Up North Uploader</h1>
+<p>Submit your images here</p>
+
+<!-- show flash messages -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flash-messages">
+    {% for message in messages %}
+    <li>{{message}}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<!-- upload form -->
+<form id="upload-form" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+
+    <!-- drag and drop area -->
+    <div id="drop-area" class="p-4 mb-3 border border-dashed text-center">
+        <p>Drag & drop your folder here</p>
+
+        <!-- button for folders -->
+        <button type="button" class="btn btn-primary me-2"
+            onclick="document.getElementById('fileElemFolder').click();">
+            Select Folder
+        </button>
+
+        <input type="file" id="fileElemFolder" name="file" webkitdirectory directory accept="image/*,video/*,audio/*"
+            style="display:none;" onchange="handleFiles(this.files)">
+    </div>
+
+<!-- File list -->
+<div id="file-list"></div>
+
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+<!-- link to JS -->
+ <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+ {% endblock %}
