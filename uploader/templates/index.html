@@ -3,6 +3,14 @@
 <head>
     <meta charset="utf-8">
     <title>Nature Up North</title>
+    <!-- Map Configuration -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+
+    <!-- END Map Configuration -->
 
     <style>
         body { font-family: Arial, sans-serif; }
@@ -39,135 +47,208 @@
     </style>
 </head>
 <body>
+<div class="container mt-5">
+    <h1>Nature Up North Uploader</h1>
 
-<h1>Nature Up North Uploader</h1>
-
-<!-- Flash messages -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul style="color: green;">
-    {% for msg in messages %}
-        <li>{{ msg }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-
-
-<!-- TABS -->
-<div class="tabs">
-    <div class="tab active" data-target="upload">Upload</div>
-    <div class="tab" data-target="affiliation">Affiliation</div>
-    <div class="tab" data-target="habitat">Habitat</div>
-    <div class="tab" data-target="dates">Date</div>
-    <div class="tab" data-target="location">Location</div>
-</div>
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul style="color: green;">
+        {% for msg in messages %}
+            <li>{{ msg }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 
 
-<!-- All tabs appear in one form, one URL -->
-<form action="/submit_all" method="POST" enctype="multipart/form-data">
-
-    <!-- Upload Section -->
-    <div id="upload" class="section active">
-        <h2>Upload Files</h2>
-        <input type="file" name="file" multiple required>
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" data-target="upload">Upload</div>
+        <div class="tab" data-target="affiliation">Affiliation</div>
+        <div class="tab" data-target="habitat">Habitat</div>
+        <div class="tab" data-target="dates">Date</div>
+        <div class="tab" data-target="location">Location</div>
     </div>
 
 
-    <!-- Affiliation Section -->
-    <div id="affiliation" class="section">
-        <h4>Affiliation</h4>
+    <!-- All tabs appear in one form, one URL -->
+    <form action="/submit_all" method="POST" enctype="multipart/form-data">
 
-        <!-- MAIN AFFILIATION -->
-        <div class="mb-3">
-            <label class="form-label">Affiliation Type</label>
-            <select class="form-select" id="affiliation_type" name="affiliation_type" required>
-                <option value="" disabled selected>Select affiliation</option>
-                <option value="University">University</option>
-                <option value="School">School</option>
-                <option value="Government">Government</option>
-                <option value="Other">Other</option>
-            </select>
+        <!-- Upload Section -->
+        <div id="upload" class="section active">
+            <h2>Upload Files</h2>
+            <input type="file" name="file" multiple required>
         </div>
 
-        <!-- SUB-AFFILIATION: always enabled (2nd dropdown list) -->
-        <div class="mb-3" id="subAffiliationContainer">
-            <label class="form-label">Sub-Affiliation</label>
-            <input type="text" class="form-control" id="sub_affiliation"
-                   name="sub_affiliation" placeholder="Select affiliation first" required>
-        </div>
-    </div>
 
+        <!-- Affiliation Section -->
+        <div id="affiliation" class="section">
+            <h2>Affiliation</h2>
 
-    <!-- Habitat Section -->
-    <div id="habitat" class="section">
-        <h2>Habitat</h2>
+            <!-- MAIN AFFILIATION -->
+            <div class="mb-3">
+                <label class="form-label">Affiliation Type</label>
+                <select class="form-select" id="affiliation_type" name="affiliation_type" required>
+                    <option value="" disabled selected>Select affiliation</option>
+                    <option value="University">University</option>
+                    <option value="School">School</option>
+                    <option value="Government">Government</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
 
-        <!-- MAIN HABITAT -->
-        <div class="mb-3">
-            <label class="form-label">Urbanization Level</label>
-            <select class="form-select" id="mainHabitat" name="mainHabitat" required>
-                <option value="" disabled selected>Select habitat type</option>
-                <option value="urban">Urban</option>
-                <option value="suburban">Suburban</option>
-                <option value="rural">Rural</option>
-                <option value="wild">Wild</option>
-            </select>
-        </div>
-
-        <!-- SUB-HABITAT WILL ALWAYS BE ENABLED (the 2nd dropdown list) -->
-        <div class="mb-3">
-            <label class="form-label">Sub-Habitat</label>
-            <select class="form-select" id="subHabitat" name="subHabitat" required>
-                <option value="" disabled selected>Select a main habitat first</option>
-            </select>
-        </div>
-    </div>
-
-
-    <!-- Date Section -->
-    <div id="dates" class="section">
-        <h2>Deployment Dates</h2>
-
-        <div class="mb-3">
-            <label class="form-label">Start of Camera Deployment</label>
-            <input type="date" id="start_date" name="start_date" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">End of Camera Deployment</label>
-            <input type="date" id="end_date" name="end_date" class="form-control" required>
-            <div id="dateError" style="color:red; display:none; margin-top:5px;">
-                ! End date cannot be before start date.
+            <!-- SUB-AFFILIATION: always enabled (2nd dropdown list) -->
+            <div class="mb-3" id="subAffiliationContainer">
+                <label class="form-label">Sub-Affiliation</label>
+                <input type="text" class="form-control" id="sub_affiliation"
+                       name="sub_affiliation" placeholder="Select affiliation first" required>
             </div>
         </div>
-    </div>
 
 
-    <!-- Location Section -->
-    <div class="tab">
-        <a href="/location" style="text-decoration:none; color:inherit;">Location</a>
-    </div>
+        <!-- Habitat Section -->
+        <div id="habitat" class="section">
+            <h2>Habitat</h2>
+
+            <!-- MAIN HABITAT -->
+            <div class="mb-3">
+                <label class="form-label">Urbanization Level</label>
+                <select class="form-select" id="mainHabitat" name="mainHabitat" required>
+                    <option value="" disabled selected>Select habitat type</option>
+                    <option value="urban">Urban</option>
+                    <option value="suburban">Suburban</option>
+                    <option value="rural">Rural</option>
+                    <option value="wild">Wild</option>
+                </select>
+            </div>
+
+            <!-- SUB-HABITAT WILL ALWAYS BE ENABLED (the 2nd dropdown list) -->
+            <div class="mb-3">
+                <label class="form-label">Sub-Habitat</label>
+                <select class="form-select" id="subHabitat" name="subHabitat" required>
+                    <option value="" disabled selected>Select a main habitat first</option>
+                </select>
+            </div>
+        </div>
 
 
-    <br><br>
-    <button type="submit" id="submitAll">Submit All</button>
+        <!-- Date Section -->
+        <div id="dates" class="section">
+            <h2>Deployment Dates</h2>
 
-</form>
+            <div class="mb-3">
+                <label class="form-label">Start of Camera Deployment</label>
+                <input type="date" id="start_date" name="start_date" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">End of Camera Deployment</label>
+                <input type="date" id="end_date" name="end_date" class="form-control" required>
+                <div id="dateError" style="color:red; display:none; margin-top:5px;">
+                    ! End date cannot be before start date.
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Location Section -->
+        <div id="location" class="section">
+            <h2> Location </h2>
+            <div id="map" style="width: 100%; height: 400px"></div>
+            <!-- Make sure you put this AFTER Leaflet's CSS -->
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin="">
+            </script>
+
+            <p id="latlon"> Select your location by clicking on the map </p>
+            <div style="display: flex; gap: 20px;">
+                <button type = submit id="saveCoordinates"> SAVE COORDINATES </button>
+                <p id="save"></p>
+                <span id="check" class="checkmark" style="color: green;"></span>
+            </div>
+            <script>
+                const latlon = document.getElementById("latlon")
+                var map = L.map('map').setView([44.597, -75.168], 10);
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+
+                var marker = L.marker();
+                var lat;
+                var lan;
+
+                function onMapClick(e) {
+                    // new coordinates not yet saved
+                    check= document.getElementById("check")
+                    check.textContent = '';
+                    save = document.getElementById("save")
+                    save.textContent = " not saved";
+                    save.style.color = "black";
+
+                    marker.setLatLng(e.latlng);
+                    marker.addTo(map);
+                    lat = e.latlng.lat;
+                    lan = e.latlng.lng;
+                    latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
+                    }
+
+                var button = document.getElementById('saveCoordinates');
+
+                function saveLocation() {
+                    // show green check and "saved"
+                    check= document.getElementById("check")
+                    check.textContent = '✓';
+                    save = document.getElementById("save")
+                    save.textContent = "saved";
+                    save.style.color = "green";
+
+                    // Using Fetch API
+                    fetch('/save_coordinates', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ latitude: lat, longitude: lan})
+                    })
+                        .then(response => response.json())
+                        .then(data => console.log(data))
+                        .catch(error => console.error('Error:', error));
+                }
+
+                map.on('click', onMapClick);
+                button.addEventListener('click', saveLocation);
+
+                // Example using a hidden form and submitting via GET
+                // This would typically be inside a popup or a dedicated form
+                var formUrl = `/save_coordinates?latitude=${lat}&longitude=${lng}`;
+                // You could then redirect or use this URL in an anchor tag
+                // For a POST request, you'd need a form element and submit it
+            </script>
+        </div>
+
+        <br><br>
+        <button type="submit" id="submitAll">Submit All</button>
+
+    </form>
+</div>
 
 
 <!-- TAB SWITCHING -->
 <script>
-document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(tab => {
+        tab.addEventListener("click", () => {
 
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
 
-        document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-        document.getElementById(tab.dataset.target).classList.add("active");
+            document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+            document.getElementById(tab.dataset.target).classList.add("active");
+            map.invalidateSize() //necessary to ensure map tiles show up properly on location tab
+        });
     });
-});
 </script>
 
 

@@ -13,82 +13,81 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-    <ul class="nav nav-tabs mb-3">
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Image</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('affiliation') }}">Affiliation</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('habitat') }}">Habitat</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('dates') }}">Date</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('location') }}">Location</a></li>
-    </ul>
-    <h3> Location </h3>
-    <div id="map"></div>
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin="">
-    </script>
+    <div id="location" class="section">
+        <h2> Location </h2>
+        <div id="map"></div>
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+           crossorigin="">
+        </script>
 
-    <p id="latlon"> Select your location by clicking on the map </p>
-    <p id="submit"> SAVE COORDINATES </p>
-
+        <p id="latlon"> Select your location by clicking on the map </p>
+        <div style="display: flex; gap: 20px;">
+            <button type = submit id="saveCoordinates"> SAVE COORDINATES </button>
+            <p id="save"></p>
+            <span id="check" class="checkmark" style="color: green;"></span>
+        </div>
+    </div>
 
     <script>
-        const latlon = document.getElementById("latlon")
-        var map = L.map('map').setView([44.597, -75.168], 10);
+         const latlon = document.getElementById("latlon")
+            var map = L.map('map').setView([44.597, -75.168], 10);
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
 
-        var marker = L.marker();
-        var popup = L.popup();
-        var lat;
-        var lan;
+            var marker = L.marker();
+            var lat;
+            var lan;
 
-        function onMapClick(e) {
-            marker.setLatLng(e.latlng);
-            marker.addTo(map);
-            lat = e.latlng.lat;
-            lan = e.latlng.lng;
-            latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
+            function onMapClick(e) {
+                // new coordinates not yet saved
+                check= document.getElementById("check")
+                check.textContent = '';
+                save = document.getElementById("save")
+                save.textContent = " not saved";
+                save.style.color = "black";
 
-            //popup
-            //    .setLatLng(e.latlng)
-            //    .setContent("You clicked the map at " + e.latlng.toString())
-            //    .openOn(map);
-        }
+                marker.setLatLng(e.latlng);
+                marker.addTo(map);
+                lat = e.latlng.lat;
+                lan = e.latlng.lng;
+                latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
+                }
 
-        var button = document.getElementById('submit');
+            var button = document.getElementById('saveCoordinates');
 
-        function saveLocation() {
-            alert('Coordinates saved successfully!');
-            // Using Fetch API
-            fetch('/save_coordinates', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ latitude: lat, longitude: lan})
-            })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-        }
+            function saveLocation() {
+                // show green check and "saved"
+                check= document.getElementById("check")
+                check.textContent = '✓';
+                save = document.getElementById("save")
+                save.textContent = "saved";
+                save.style.color = "green";
 
-        map.on('click', onMapClick);
-        button.addEventListener('click', saveLocation);
+                // Using Fetch API
+                fetch('/save_coordinates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ latitude: lat, longitude: lan})
+                })
+                    .then(response => response.json())
+                    .then(data => console.log(data))
+                    .catch(error => console.error('Error:', error));
+            }
 
-        // Example using a hidden form and submitting via GET
-        // This would typically be inside a popup or a dedicated form
-        var formUrl = `/save_coordinates?latitude=${lat}&longitude=${lng}`;
-        // You could then redirect or use this URL in an anchor tag
-        // For a POST request, you'd need a form element and submit it
+            map.on('click', onMapClick);
+            button.addEventListener('click', saveLocation);
+
+            // Example using a hidden form and submitting via GET
+            // This would typically be inside a popup or a dedicated form
+            var formUrl = `/save_coordinates?latitude=${lat}&longitude=${lng}`;
+            // You could then redirect or use this URL in an anchor tag
+            // For a POST request, you'd need a form element and submit it
     </script>
-
-
-
-
-
 </body>
 </html>
