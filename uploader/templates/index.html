@@ -112,6 +112,26 @@
             <h2>Habitat</h2>
 
             <!-- Urbanization -->
+            <form method = "POST" style="padding: 40px;">
+            <h5> Urbanization </h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
+                    <label class="form-check-label">Urban</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="urbanization" value="suburban">
+                    <label class="form-check-label">Suburban</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="urbanization" value="rural">
+                    <label class="form-check-label">Rural</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="urbanization" value="wild">
+                    <label class="form-check-label">Wild</label>
+                </div>
+            </form>
+
             <div class="mb-3">
                 <label class="form-label">Urbanization </label>
                 <select class="form-select" id="mainHabitat" name="mainHabitat" required>
