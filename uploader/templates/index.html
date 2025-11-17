@@ -48,7 +48,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Nature Up North Uploader</h1>
+    <h1>Nature Up North Dorsie Upload</h1>
 
     <!-- Flash messages -->
     {% with messages = get_flashed_messages() %}
@@ -69,6 +69,7 @@
         <div class="tab" data-target="habitat">Habitat</div>
         <div class="tab" data-target="dates">Date</div>
         <div class="tab" data-target="location">Location</div>
+        <div class="tab" data-target="submit">Submit</div>
     </div>
 
 
@@ -79,6 +80,13 @@
         <div id="upload" class="section active">
             <h2>Upload Files</h2>
             <input type="file" name="file" multiple required>
+
+            <br><br>
+            <div style="display: flex; gap: 20px; align-items:flex-start;">
+                <button type = submit id="saveFiles"> Save Files </button>
+                <p id="savefile"></p>
+                <span id="checkfile" class="checkmark" style="color:green;"></span>
+            </div>
         </div>
 
 
@@ -104,71 +112,81 @@
                 <input type="text" class="form-control" id="sub_affiliation"
                        name="sub_affiliation" placeholder="Select affiliation first" required>
             </div>
+
+            <br>
+            <div style="display: flex; gap: 20px; align-items:flex-start;">
+                <button type = submit id="saveAffiliation"> Save Affiliation </button>
+                <p id="saveaffil"></p>
+                <span id="checkaffil" class="checkmark" style="color:green;"></span>
+            </div>
         </div>
 
 
         <!-- Habitat Section -->
         <div id="habitat" class="section">
-            <h2>Habitat</h2>
-            <div style="display: flex; justify-content: left;">
-                <!-- Habitat -->
-                <form method = "POST" style="padding: 40px;">
-                    <h5> Habitat </h5>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="deciduous forest">
-                        <label class="form-check-label">Deciduous Forest</label>
-                     </div>
+            <h2>Habitat and Urbanization</h2>
+            <div class = "form-container" style="display: flex; justify-content:left; align-items:flex-start; gap:20%;">
+                <div id="habitat_type" style="margin-left:5%; width:35%">
+                <form method ="POST">
+                    <!--<h5> Habitat </h5>-->
+                    <p> Which of the following terms would characterize the habitat in the location where the camera was placed? (check all that apply) </p>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="mixed forest">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="deciduous forest" required>
+                        <label for="habitat">Deciduous Forest</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="mixed forest" required>
                         <label class="form-check-label">Mixed Forest</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="evergreen forest">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="evergreen forest" required>
                         <label class="form-check-label">Evergreen Forest</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="plantation forest">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="plantation forest" required>
                         <label class="form-check-label">Plantation Forest</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="natural field">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="natural field" required>
                         <label class="form-check-label">Natural Field or Meadow (Old Field)</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="agricultural field">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="agricultural field" required>
                         <label class="form-check-label">Agricultural Field</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="public park/school grounds">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="public park/school grounds" required>
                         <label class="form-check-label">Public Park/School Grounds</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="home lawn">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="home lawn" required>
                         <label class="form-check-label">Home Lawn</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="garden">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="garden" required>
                         <label class="form-check-label">Garden</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="wetland edge">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="wetland edge" required>
                         <label class="form-check-label">Wetland Edge</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="edge between two habitats">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="edge between two habitats" required>
                         <label class="form-check-label">Edge Between Two Habitats</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="habitat" value="other">
+                        <input class="form-check-input" type="checkbox" name="habitat" value="other" required>
                         <label class="form-check-label">Other</label>
                     </div>
                 </form>
+                </div>
 
-                <!-- Urbanization -->
-                <form method = "POST" style="padding: 40px;">
-                <h5> Urbanization </h5>
+                <div id="urbanization_type" style="width:35%">
+                <form method ="POST">
+                    <!--<h5> Urbanization </h5>-->
+                    <p> How urbanized is the location where the camera was placed? </p>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="urbanization" value="urban">
+                        <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
                         <label class="form-check-label">Urban</label>
                     </div>
                     <div class="form-check">
@@ -184,6 +202,14 @@
                         <label class="form-check-label">Wild</label>
                     </div>
                 </form>
+                </div>
+            </div>
+
+            <br>
+            <div style="display: flex; gap: 20px; align-items:flex-start;">
+                <button type = submit id="saveHabitat"> Save Habitat </button>
+                <p id="savehabi"></p>
+                <span id="checkhabi" class="checkmark" style="color:green;"></span>
             </div>
         </div>
 
@@ -204,24 +230,32 @@
                     ! End date cannot be before start date.
                 </div>
             </div>
+
+            <br>
+            <div style="display: flex; gap: 20px; align-items:flex-start;">
+                <button type = submit id="saveDates"> Save Dates </button>
+                <p id="savedate"></p>
+                <span id="checkdate" class="checkmark" style="color:green;"></span>
+            </div>
         </div>
 
 
         <!-- Location Section -->
         <div id="location" class="section">
             <h2> Location </h2>
+            <p> Select the location of your camera deployment by clicking on the map </p>
             <div id="map" style="width: 100%; height: 400px"></div>
             <!-- Make sure you put this AFTER Leaflet's CSS -->
             <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin="">
             </script>
-
-            <p id="latlon"> Select your location by clicking on the map </p>
-            <div style="display: flex; gap: 20px;">
-                <button type = submit id="saveCoordinates"> SAVE COORDINATES </button>
-                <p id="save"></p>
-                <span id="check" class="checkmark" style="color: green;"></span>
+            <p id="latlon" style="margin-top:15px">  </p>
+            <br>
+            <div style="display: flex; gap: 20px; align-items:flex-start;">
+                <button type = submit id="saveLocation"> Save Location </button>
+                <p id="saveloc"></p>
+                <span id="checkloc" class="checkmark" style="color:green;"></span>
             </div>
             <script>
                 const latlon = document.getElementById("latlon")
@@ -237,10 +271,10 @@
 
                 function onMapClick(e) {
                     // new coordinates not yet saved
-                    check= document.getElementById("check")
+                    check= document.getElementById("checkloc")
                     check.textContent = '';
-                    save = document.getElementById("save")
-                    save.textContent = " not saved";
+                    save = document.getElementById("saveloc")
+                    save.textContent = "not saved";
                     save.style.color = "black";
 
                     marker.setLatLng(e.latlng);
@@ -250,13 +284,13 @@
                     latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
                     }
 
-                var button = document.getElementById('saveCoordinates');
+                var button = document.getElementById('saveLocation');
 
                 function saveLocation() {
                     // show green check and "saved"
-                    check= document.getElementById("check")
+                    check= document.getElementById("checkloc")
                     check.textContent = '✓';
-                    save = document.getElementById("save")
+                    save = document.getElementById("saveloc")
                     save.textContent = "saved";
                     save.style.color = "green";
 
@@ -284,9 +318,15 @@
             </script>
         </div>
 
-        <br><br>
-        <button type="submit" id="submitAll">Submit All</button>
-
+        <!-- Submit Section -->
+        <div id="submit" class="section">
+            <h2> Comments and Submission </h2>
+            <p>Is there anything else you'd like to share about this submission?:</p>
+            <label for="comment"></label>
+            <textarea id="comment" name="comment" rows="5" cols="40"></textarea>
+            <br><br>
+            <button type="submit" id="submitAll">Submit All</button>
+        </div>
     </form>
 </div>
 
