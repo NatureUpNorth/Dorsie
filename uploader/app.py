@@ -1,19 +1,17 @@
-# from flask import Flask, render_template, request, redirect, url_for
 import os
-from flask import Flask, request, render_template_string, redirect, url_for
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask import Flask, render_template, request, redirect, url_for, flash
-from werkzeug.utils import secure_filename
+import json
+from flask import Flask, render_template, request, flash, session, jsonify, redirect, url_for
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 
 app = Flask(__name__)
+app.secret_key = "secret"
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.secret_key = 'dummy_secret_key'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# Dummy user class
+
 class User(UserMixin):
     def __init__(self, id):
         self.id = id
@@ -23,60 +21,56 @@ class User(UserMixin):
     def get_id(self):
         return self.id
 
-# Only one user!
-users = {'123': User('123')}
+
+users = {"123": User("123")}
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return users.get(user_id)
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route("/", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == '123' and password == '123':
-            user = users[username]
-            login_user(user)
-            return redirect(url_for('index'))
-        return render_template_string(LOGIN_TEMPLATE, error="Invalid credentials.")
-    return render_template_string(LOGIN_TEMPLATE)
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-LOGIN_TEMPLATE = '''
-<!doctype html>
-<title>Login</title>
-<h2>Login</h2>
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %}
-<form method="post">
-    Username: <input name="username" type="text"><br>
-    Password: <input name="password" type="password"><br>
-    <input type="submit" value="Login">
-</form>
-'''
+        if username == "123" and password == "123":
+            login_user(users["123"])
+            return redirect(url_for("index"))
 
-#cooper start
-# folder where uploaded files will be stored
-app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')
+        flash("Invalid login. Try again.")
+        return redirect("/")
 
-# key used so flash messages can work
-# the secret key is used to secure and validate the data saved in the user's session cookie
-app.secret_key = os.environ.get('FLASK_SECRET', 'dev_secret_key')
+    return """
+    <!doctype html>
+    <title>Login</title>
+    <h2>Login</h2>
+    <form method="post">
+        Username: <input name="username" type="text"><br>
+        Password: <input name="password" type="password"><br><br>
+        <input type="submit" value="Login">
+    </form>
+    """
 
-# To limit file types that can be uploaded
-ALLOWED_EXTENSIONS = {'jpeg', 'jpg', 'png', 'mp3', 'mp4', 'mov'}
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'avi', 'mov'}
 
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# home page route
-@app.route('/index')
+@app.route("/index")
+@login_required
 def index():
     return render_template('upload.html')
 
+@app.route("/location")
+@login_required
+def location():
+    return render_template("map.html")
 
 # upload route, only works with POST requests,  POST requests are used for sending data to the server
 @app.route('/upload', methods=['GET','POST'])
@@ -180,6 +174,67 @@ def location():
         return redirect(url_for('index'))  # or thank you page
     return render_template('location.html')
 
-if __name__ == '__main__':
+@app.route("/upload_files", methods=["POST"])
+@login_required
+def upload_files():
+    files = request.files.getlist("file")
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+    saved_files = []
+    for f in files:
+        if f and allowed_file(f.filename):
+            path = os.path.join(app.config["UPLOAD_FOLDER"], f.filename)
+            f.save(path)
+            saved_files.append(f.filename)
+
+    session["files"] = saved_files
+    return jsonify({"status": "ok", "files": saved_files})
+
+
+@app.route("/submit_all", methods=["POST"])
+@login_required
+def submit_all():
+    os.makedirs("uploads", exist_ok=True)
+
+    uploaded_files = []
+    files = request.files.getlist("file")
+    for f in files:
+        if f and f.filename:
+            save_path = os.path.join("uploads", f.filename)
+            f.save(save_path)
+            uploaded_files.append(f.filename)
+
+    record = {
+        "affiliation": {
+            "type": request.form.get("affiliation_type"),
+            "sub": request.form.get("sub_affiliation")
+        },
+        "habitat": {
+            "type": request.form.get("mainHabitat"),
+            "sub": request.form.get("subHabitat")
+        },
+        "dates": {
+            "start_date": request.form.get("start_date"),
+            "end_date": request.form.get("end_date")
+        },
+
+        #SAVING LATITUDE AND LONGITUDE FROM MAP
+        "coordinates": {
+            "lat": session.get("latitude"),
+            "lon": session.get("longitude")
+        },
+
+        "location_name": request.form.get("location"),
+        "uploaded_files": uploaded_files
+    }
+
+    with open("uploads/record.json", "w") as f:
+        json.dump(record, f, indent=4)
+
+    flash("All data submitted successfully!")
+    return redirect("/index")
+
+
+if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
