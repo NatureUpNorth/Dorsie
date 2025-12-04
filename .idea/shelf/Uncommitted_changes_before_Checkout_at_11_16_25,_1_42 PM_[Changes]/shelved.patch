@@ -1,0 +1,156 @@
+Index: uploader/app.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># from flask import Flask, render_template, request, redirect, url_for\r\nimport os\r\nfrom flask import Flask, request, render_template_string, redirect, url_for\r\nfrom flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user\r\nfrom flask import Flask, render_template, request, redirect, url_for, flash\r\nfrom werkzeug.utils import secure_filename\r\n\r\napp = Flask(__name__)\r\napp.config['UPLOAD_FOLDER'] = 'uploads'\r\napp.secret_key = 'dummy_secret_key'\r\n\r\nlogin_manager = LoginManager()\r\nlogin_manager.init_app(app)\r\nlogin_manager.login_view = \"login\"\r\n\r\n# Dummy user class\r\nclass User(UserMixin):\r\n    def __init__(self, id):\r\n        self.id = id\r\n        self.name = \"123\"\r\n        self.password = \"123\"\r\n\r\n    def get_id(self):\r\n        return self.id\r\n\r\n# Only one user!\r\nusers = {'123': User('123')}\r\n\r\n@login_manager.user_loader\r\ndef load_user(user_id):\r\n    return users.get(user_id)\r\n\r\n@app.route('/', methods=['GET', 'POST'])\r\ndef login():\r\n    if request.method == 'POST':\r\n        username = request.form.get('username')\r\n        password = request.form.get('password')\r\n        if username == '123' and password == '123':\r\n            user = users[username]\r\n            login_user(user)\r\n            return redirect(url_for('index'))\r\n        return render_template_string(LOGIN_TEMPLATE, error=\"Invalid credentials.\")\r\n    return render_template_string(LOGIN_TEMPLATE)\r\n\r\nLOGIN_TEMPLATE = '''\r\n<!doctype html>\r\n<title>Login</title>\r\n<h2>Login</h2>\r\n{% if error %}\r\n<p style=\"color:red;\">{{ error }}</p>\r\n{% endif %}\r\n<form method=\"post\">\r\n    Username: <input name=\"username\" type=\"text\"><br>\r\n    Password: <input name=\"password\" type=\"password\"><br>\r\n    <input type=\"submit\" value=\"Login\">\r\n</form>\r\n'''\r\n\r\n#cooper start\r\n# folder where uploaded files will be stored\r\napp.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')\r\n\r\n# key used so flash messages can work\r\n# the secret key is used to secure and validate the data saved in the user's session cookie\r\napp.secret_key = os.environ.get('FLASK_SECRET', 'dev_secret_key')\r\n\r\n# To limit file types that can be uploaded\r\nALLOWED_EXTENSIONS = {'jpeg', 'jpg', 'png', 'mp3', 'mp4', 'mov'}\r\n\r\n\r\ndef allowed_file(filename):\r\n    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS\r\n\r\n\r\n# home page route\r\n@app.route('/index')\r\ndef index():\r\n    return render_template('index.html')\r\n\r\n\r\n# upload route, only works with POST requests,  POST requests are used for sending data to the server\r\n@app.route('/upload', methods=['POST'])\r\ndef upload():\r\n    # check if the form/request has the file part\r\n    if 'file' not in request.files:\r\n        flash('No file part')\r\n        return redirect(url_for('index'))\r\n\r\n    # get a list of files from the request\r\n    files = request.files.getlist('file')\r\n\r\n    # make sure at least one file was selected\r\n    if not files or files[0].filename == '':\r\n        flash('No selected file')\r\n        return redirect(url_for('index'))\r\n\r\n    # create upload folder if it doesn't exist\r\n    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)\r\n\r\n    skipped = []\r\n\r\n    # save each uploaed file to the upload folder\r\n    for file in files:\r\n        if file and file.filename:\r\n            # clean and simplify the filename to make it secure\r\n            fname = secure_filename(os.path.basename(file.filename))\r\n            if not fname:\r\n                continue\r\n            # only save files with allowed extensions\r\n            if allowed_file(fname):\r\n                file.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))\r\n            else:\r\n                skipped.append(fname)\r\n\r\n    if skipped:\r\n        flash(f'Skipped files with unsupported extensions: {\", \".join(skipped)}')\r\n    else:\r\n        flash('All files uploaded successfully!')\r\n\r\n    # show success message and redirect to home page\r\n    flash('Files uploaded successfully!')\r\n    return redirect(url_for('index'))\r\n\r\n# @app.route('/index', methods=['GET', 'POST'])\r\n# def index():\r\n#     if request.method == 'POST':\r\n#         image = request.files.get('image')\r\n#         if image:\r\n#             image.save(os.path.join(app.config['UPLOAD_FOLDER'], image.filename))\r\n#         return redirect(url_for('affiliation'))\r\n#     return render_template('index.html')\r\n\r\n\r\n@app.route('/affiliation', methods=['GET', 'POST'])\r\ndef affiliation():\r\n    if request.method == 'POST':\r\n        # Step 1: Choose affiliation type\r\n        selected_type = request.form.get('affiliation_type')\r\n        if selected_type:\r\n            return render_template('affiliation_sub.html', affiliation_type=selected_type)\r\n    return render_template('affiliation.html')\r\n\r\n\r\n@app.route('/affiliation/submit', methods=['POST'])\r\ndef submit_affiliation():\r\n    affiliation_type = request.form.get('affiliation_type')\r\n    sub_affiliation = request.form.get('sub_affiliation')\r\n\r\n    print(f\"Affiliation Type: {affiliation_type}\")\r\n    print(f\"Sub Affiliation: {sub_affiliation}\")\r\n\r\n    return redirect(url_for('habitat'))\r\n\r\n#\r\n# @app.route('/affiliation', methods=['GET', 'POST'])\r\n# def affiliation():\r\n#     if request.method == 'POST':\r\n#         affiliation = request.form.get('affiliation')\r\n#         print(f\"Affiliation: {affiliation}\")\r\n#         return redirect(url_for('habitat'))\r\n#     return render_template('affiliation.html')\r\n\r\n@app.route('/habitat', methods=['GET', 'POST'])\r\ndef habitat():\r\n    if request.method == 'POST':\r\n        main = request.form.get('mainHabitat')\r\n        sub = request.form.get('subHabitat')\r\n        print(f\"Main: {main}, Sub: {sub}\")\r\n        return redirect(url_for('dates'))\r\n    return render_template('habitat.html')\r\n\r\n@app.route('/dates', methods=['GET', 'POST'])\r\ndef dates():\r\n    if request.method == 'POST':\r\n        date = request.form.get('date')\r\n        print(f\"Date: {date}\")\r\n        return redirect(url_for('location'))\r\n    return render_template('dates.html')\r\n\r\n@app.route('/location', methods=['GET', 'POST'])\r\ndef location():\r\n    if request.method == 'POST':\r\n        location = request.form.get('location')\r\n        print(f\"Location: {location}\")\r\n        return redirect(url_for('index'))  # or thank you page\r\n    return render_template('map.html')\r\n\r\n@app.route('/save_coordinates', methods=['POST'])\r\ndef save_coordinates():\r\n    if request.method == 'POST':\r\n        data = request.get_json()\r\n        latitude = data.get('latitude')\r\n        longitude = data.get('longitude')\r\n\r\n        # Here you would save the latitude and longitude to a database\r\n        # For example, using SQLAlchemy:\r\n        # new_location = Location(latitude=latitude, longitude=longitude)\r\n        # db.session.add(new_location)\r\n        # db.session.commit()\r\n\r\n        print(f\"Received coordinates: Lat={latitude}, Lng={longitude}\")\r\n        return jsonify({\"message\": \"Coordinates saved successfully\"}), 200\r\n    print(\"dammit\")\r\n    return jsonify({\"message\": \"Invalid request method\"}), 405\r\n\r\nif __name__ == '__main__':\r\n    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)\r\n    app.run(debug=True)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/uploader/app.py b/uploader/app.py
+--- a/uploader/app.py	(revision ea16bbbd5ae4027cb34dcd752986efda1788b512)
++++ b/uploader/app.py	(date 1762230178009)
+@@ -2,7 +2,7 @@
+ import os
+ from flask import Flask, request, render_template_string, redirect, url_for
+ from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+-from flask import Flask, render_template, request, redirect, url_for, flash
++from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+ from werkzeug.utils import secure_filename
+ 
+ app = Flask(__name__)
+Index: uploader/templates/habitat.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{% extends 'base.html' %}\r\n{% block content %}\r\n<h3>Habitat and Urbanization</h3>\r\n<form method=\"POST\">\r\n    <div class=\"mb-3\">\r\n        <label for=\"mainHabitat\" class=\"form-label\">Setting Type</label>\r\n        <select id=\"mainHabitat\" name=\"mainHabitat\" class=\"form-select\" onchange=\"updateSubOptions()\" required>\r\n            <option value=\"\">-- Select Setting --</option>\r\n            <option value=\"urban\">Urban</option>\r\n            <option value=\"suburban\">Suburban</option>\r\n            <option value=\"rural\">Rural</option>\r\n            <option value=\"wild\">Wild</option>\r\n        </select>\r\n    </div>\r\n\r\n    <div class=\"mb-3\">\r\n        <label for=\"subHabitat\" class=\"form-label\">Specific Habitat</label>\r\n        <select id=\"subHabitat\" name=\"subHabitat\" class=\"form-select\" required>\r\n            <option value=\"\">-- Select Sub-Habitat --</option>\r\n        </select>\r\n    </div>\r\n\r\n    <button type=\"submit\" class=\"btn btn-primary\">Next</button>\r\n</form>\r\n\r\n<script>\r\n    const subOptions = {\r\n        \"urban\": [\"Home lawn\", \"Garden\", \"Other\"],\r\n        \"suburban\": [\"Home lawn\", \"Garden\", \"Other\"],\r\n        \"rural\": [\"Plantation forest\", \"Natural field or meadow\", \"Home lawn\", \"Garden\", \"Other\"],\r\n        \"wild\": [\"Deciduous forest\", \"Wild forest\", \"Evergreen forest\", \"Other\"]\r\n    };\r\n\r\n    function updateSubOptions() {\r\n        const mainSelect = document.getElementById(\"mainHabitat\");\r\n        const subSelect = document.getElementById(\"subHabitat\");\r\n\r\n        const selectedMain = mainSelect.value;\r\n        subSelect.innerHTML = '<option value=\"\">-- Select Sub-Habitat --</option>';\r\n\r\n        if (selectedMain && subOptions[selectedMain]) {\r\n            subOptions[selectedMain].forEach(opt => {\r\n                let option = document.createElement(\"option\");\r\n                option.value = opt;\r\n                option.text = opt;\r\n                subSelect.appendChild(option);\r\n            });\r\n        }\r\n    }\r\n</script>\r\n{% endblock %}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/uploader/templates/habitat.html b/uploader/templates/habitat.html
+--- a/uploader/templates/habitat.html	(revision ea16bbbd5ae4027cb34dcd752986efda1788b512)
++++ b/uploader/templates/habitat.html	(date 1763318406695)
+@@ -1,51 +1,80 @@
+ {% extends 'base.html' %}
+ {% block content %}
+ <h3>Habitat and Urbanization</h3>
+-<form method="POST">
+-    <div class="mb-3">
+-        <label for="mainHabitat" class="form-label">Setting Type</label>
+-        <select id="mainHabitat" name="mainHabitat" class="form-select" onchange="updateSubOptions()" required>
+-            <option value="">-- Select Setting --</option>
+-            <option value="urban">Urban</option>
+-            <option value="suburban">Suburban</option>
+-            <option value="rural">Rural</option>
+-            <option value="wild">Wild</option>
+-        </select>
+-    </div>
+-
+-    <div class="mb-3">
+-        <label for="subHabitat" class="form-label">Specific Habitat</label>
+-        <select id="subHabitat" name="subHabitat" class="form-select" required>
+-            <option value="">-- Select Sub-Habitat --</option>
+-        </select>
+-    </div>
+-
+-    <button type="submit" class="btn btn-primary">Next</button>
+-</form>
+-
+-<script>
+-    const subOptions = {
+-        "urban": ["Home lawn", "Garden", "Other"],
+-        "suburban": ["Home lawn", "Garden", "Other"],
+-        "rural": ["Plantation forest", "Natural field or meadow", "Home lawn", "Garden", "Other"],
+-        "wild": ["Deciduous forest", "Wild forest", "Evergreen forest", "Other"]
+-    };
++
++<div style="display: flex; justify-content: left">
++    <form method = "POST" style="padding: 40px;">
++        <h5> Habitat </h5>
++         <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="deciduous forest" required>
++            <label class="form-check-label">Deciduous Forest</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="mixed forest" required>
++            <label class="form-check-label">Mixed Forest</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="evergreen forest" required>
++            <label class="form-check-label">Evergreen Forest</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="plantation forest" required>
++            <label class="form-check-label">Plantation Forest</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="natural field" required>
++            <label class="form-check-label">Natural Field or Meadow (Old Field)</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="agricultural field" required>
++            <label class="form-check-label">Agricultural Field</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="public park/school grounds" required>
++            <label class="form-check-label">Public Park/School Grounds</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="home lawn" required>
++            <label class="form-check-label">Home Lawn</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="garden" required>
++            <label class="form-check-label">Garden</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="wetland edge" required>
++            <label class="form-check-label">Wetland Edge</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="edge between two habitats" required>
++            <label class="form-check-label">Edge Between Two Habitats</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="checkbox" name="habitat" value="other" required>
++            <label class="form-check-label">Other</label>
++        </div>
++    </form>
++
++    <form method = "POST" style="padding: 40px;">
++    <h5> Urbanization </h5>
++        <div class="form-check">
++            <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
++            <label class="form-check-label">Urban</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="radio" name="urbanization" value="suburban">
++            <label class="form-check-label">Suburban</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="radio" name="urbanization" value="rural">
++            <label class="form-check-label">Rural</label>
++        </div>
++        <div class="form-check">
++            <input class="form-check-input" type="radio" name="urbanization" value="wild">
++            <label class="form-check-label">Wild</label>
++        </div>
++    </form>
++</div>
++    <button type="submit" class="btn btn-primary">Set Habitat</button>
+ 
+-    function updateSubOptions() {
+-        const mainSelect = document.getElementById("mainHabitat");
+-        const subSelect = document.getElementById("subHabitat");
+-
+-        const selectedMain = mainSelect.value;
+-        subSelect.innerHTML = '<option value="">-- Select Sub-Habitat --</option>';
+-
+-        if (selectedMain && subOptions[selectedMain]) {
+-            subOptions[selectedMain].forEach(opt => {
+-                let option = document.createElement("option");
+-                option.value = opt;
+-                option.text = opt;
+-                subSelect.appendChild(option);
+-            });
+-        }
+-    }
+-</script>
+ {% endblock %}
