@@ -1,166 +1,680 @@
-{% extends 'base.html' %}
-{% block content %}
-<!--<h3>Upload Image</h3>-->
-<!--<form method="POST" enctype="multipart/form-data">-->
-<!--    <div class="mb-3">-->
-<!--        <label for="image" class="form-label">Choose Image</label>-->
-<!--        <input type="file" name="image" class="form-control" required>-->
-<!--    </div>-->
-<!--    <button type="submit" class="btn btn-primary">Next</button>-->
+<!DOCTYPE html>
+<html>
 
-<!--<!doctype html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--<meta charset="UTF-8">-->
-<!--<title>Nature Up North Uploader</title>-->
-<!--</head>-->
-<!--<body>-->
-<h1>Nature Up North Uploader</h1>
-<p>Submit your images here.</p>
+<head>
+    <meta charset="utf-8">
+    <title>Nature Up North</title>
+    <!-- Map Configuration -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-<!-- Show flash messages -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul style="color: green;">
-{% for message in messages %}
-<li>{{ message }}</li>
-{% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+    <!-- END Map Configuration -->
 
-<!-- Upload form, action=/ sends files to the flask /upload route -->
-<!-- multipart/form-data lets file data be sent -->
-<form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
 
-<!-- Drag and drop area -->
-<div id="drop-area" style="border:2px dashed #ccc; padding:30px; text-align:center; margin-bottom:10px;">
-<p>Drag & drop files here or</p>
-<input type="file" webkitdirectory id="fileElem" name="file" style="display:none" multiple accept="image/*,video/*,audio/*" onchange="handleFiles(this.files)">
-<!-- Progress Bar -->
-<progress id="upload-progress" value="0" max="100"style="width:100%; display:none;"> </progress>
+        .tabs {
+            display: flex;
+            gap: 20px;
+            background: #eee;
+            padding: 12px;
+            border-bottom: 2px solid #ccc;
+        }
 
-<!-- Button to open the file -->
-<button type="button" onclick="document.getElementById('fileElem').click();">Select Files</button>
-</div>
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
 
-<!-- List of files to be uploaded-->
-<div id="file-list"></div>
-<button type="submit">Upload</button>
-</form>
+        .tab.active {
+            border-bottom: 3px solid green;
+            font-weight: bold;
+        }
 
-<!-- JavaScript -->
-<script>
-// get page elements
-let dropArea = document.getElementById('drop-area');
-let fileList = document.getElementById('file-list');
-let filesToUpload = [];
+        .tab.error {
+            border-bottom: 3px solid red !important;
+            color: red;
+            font-weight: bold;
+        }
 
-// highlight area when dragging files over it
-dropArea.addEventListener('dragover', (e) => {
-e.preventDefault();
-dropArea.style.background = '#eee';
-});
+        .section {
+            display: none;
+            margin-top: 20px;
+        }
 
-// remove highlight when not dragging over
-dropArea.addEventListener('dragleave', (e) => {
-e.preventDefault();
-dropArea.style.background = '';
-});
+        .section.active {
+            display: block;
+        }
 
-// handle dropped files
-dropArea.addEventListener('drop', (e) => {
-e.preventDefault();
-dropArea.style.background = '';
-handleFiles(e.dataTransfer.files);
-});
+        /* upload section */
+        #drop-area {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 10px;
+            transition: 0.3s ease;
+        }
 
-// show selected files in a list with remove buttons
-function renderFileList() {
-fileList.innerHTML = '';
-filesToUpload.forEach((f, idx) => {
-let row = document.createElement('div');
-row.style.display = 'flex';
-row.style.justifyContent = 'space-between';
-row.style.alignItems = 'center';
-row.style.padding = '4px 0';
-let name = document.createElement('span');
-name.textContent = f.webkitRelativePath || f.name;
-let removeBtn = document.createElement('button');
-removeBtn.type = 'button';
-removeBtn.textContent = 'Remove';
-removeBtn.onclick = () => {
-filesToUpload.splice(idx, 1);
-syncInputFiles();
-renderFileList();
-};
-row.appendChild(name);
-row.appendChild(removeBtn);
-fileList.appendChild(row);
-});
-}
+        #drop-area.dragover {
+            background: #eee;
+        }
 
-// copies all files from filesToUpload array to the hidden file input
-// so they get submitted with the form
-function syncInputFiles() {
-let input = document.getElementById('fileElem');
-let dt = new DataTransfer();
-filesToUpload.forEach(f => dt.items.add(f));
-input.files = dt.files;
-}
+        .flash-messages {
+            color: green;
+            list-style: none;
+            padding-left: 0;
+        }
 
-// add new files and refresh list
-function handleFiles(files) {
-// When adding, keep existing files (allow multiple drags)
-filesToUpload = filesToUpload.concat(Array.from(files));
-renderFileList();
-syncInputFiles();
-}
+        .flash-messages li {
+            margin-bottom: 4px;
+        }
 
-// start of progress bar implementation
-// Intercept the form submission
-document.getElementById('upload-form').addEventListener('submit', function(e) {
-e.preventDefault(); // Stop the normal page reload
+        #file-list div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
 
-const progressBar = document.getElementById('upload-progress');
-progressBar.style.display = 'block';
-progressBar.value = 0;
+        #file-list button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
 
-const formData = new FormData();
-filesToUpload.forEach(f => formData.append('file', f));
+<body>
+    <div class="container mt-5">
+        <h1>Nature Up North Dorsie Upload</h1>
 
-const xhr = new XMLHttpRequest();
-xhr.open('POST', '/upload', true);
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul style="color: green;">
+            {% for msg in messages %}
+            <li>{{ msg }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
 
-// Update progress bar as upload progresses
-xhr.upload.onprogress = function(event) {
-if (event.lengthComputable) {
-const percent = (event.loaded / event.total) * 100;
-progressBar.value = percent;
-}
-};
 
-// When upload is finished
-xhr.onload = function() {
-if (xhr.status === 200) {
-progressBar.value = 100;
-alert('Upload complete!');
-filesToUpload = [];
-renderFileList();
-progressBar.style.display = 'none';
-} else {
-alert('Upload failed. Try again.');
-progressBar.style.display = 'none';
-}
-};
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active" data-target="upload">Upload</div>
+            <div class="tab" data-target="affiliation">Affiliation</div>
+            <div class="tab" data-target="habitat">Habitat</div>
+            <div class="tab" data-target="dates">Date</div>
+            <div class="tab" data-target="location">Location</div>
+            <div class="tab" data-target="submit">Submit</div>
+        </div>
 
-xhr.send(formData);
-});
-// end of progress bar implementation
 
-</script>
-<!--</body>-->
-<!--</html>-->
+        <!-- All tabs appear in one form, one URL -->
+        <form action="/submit_all" method="POST" enctype="multipart/form-data">
 
-</form>
-{% endblock %}
+            <!-- Upload Section -->
+            <div id="upload" class="section active">
+
+                <h2>Upload Files</h2>
+
+                <!-- Flash messages -->
+                <ul class="flash-messages">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </ul>
+
+                <!-- Drag & Drop Area -->
+                <div id="drop-area" class="p-4 mb-3 border border-dashed text-center">
+                    <p>Drag & drop your folder here</p>
+
+                    <button type="button" class="btn btn-primary me-2"
+                        onclick="document.getElementById('fileElemFolder').click();">
+                        Select Folder
+                    </button>
+
+                    <input type="file" id="fileElemFolder" name="file" webkitdirectory directory
+                        accept="image/*,video/*,audio/*" style="display: none;" onchange="handleFiles(this.files)">
+                </div>
+
+                <!-- File List -->
+                <div id="file-list"></div>
+
+                <br>
+                <div style="display: flex; gap: 20px; align-items:flex-start;">
+                    <button type="button" id="saveFiles"> Save Files </button>
+                    <p id="savefile"></p>
+                    <span id="checkfile" class="checkmark" style="color:green;"></span>
+                </div>
+
+            </div>
+
+
+
+            <!-- Affiliation Section -->
+            <div id="affiliation" class="section">
+                <h2>Affiliation</h2>
+
+                <!-- MAIN AFFILIATION -->
+                <div class="mb-3">
+                    <label class="form-label">Affiliation Type</label>
+                    <select class="form-select" id="affiliation_type" name="affiliation_type" required>
+                        <option value="" disabled selected>Select affiliation</option>
+                        <option value="University">University</option>
+                        <option value="School">School</option>
+                        <option value="Government">Government</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- SUB-AFFILIATION: always enabled (2nd dropdown list) -->
+                <div class="mb-3" id="subAffiliationContainer">
+                    <label class="form-label">Sub-Affiliation</label>
+                    <input type="text" class="form-control" id="sub_affiliation" name="sub_affiliation"
+                        placeholder="Select affiliation first" required>
+                </div>
+
+                <br>
+                <div style="display: flex; gap: 20px; align-items:flex-start;">
+                    <button type=submit id="saveAffiliation"> Save Affiliation </button>
+                    <p id="saveaffil"></p>
+                    <span id="checkaffil" class="checkmark" style="color:green;"></span>
+                </div>
+            </div>
+
+
+            <!-- Habitat Section -->
+            <div id="habitat" class="section">
+                <h2>Habitat and Urbanization</h2>
+                <div class="form-container"
+                    style="display: flex; justify-content:left; align-items:flex-start; gap:20%;">
+                    <div id="habitat_type" style="margin-left:5%; width:35%">
+                        <form method="POST">
+                            <!--<h5> Habitat </h5>-->
+                            <p> Which of the following terms would characterize the habitat in the location where the
+                                camera was placed? (check all that apply) </p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="deciduous forest"
+                                    required>
+                                <label for="habitat">Deciduous Forest</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="mixed forest"
+                                    required>
+                                <label class="form-check-label">Mixed Forest</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="evergreen forest"
+                                    required>
+                                <label class="form-check-label">Evergreen Forest</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="plantation forest"
+                                    required>
+                                <label class="form-check-label">Plantation Forest</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="natural field"
+                                    required>
+                                <label class="form-check-label">Natural Field or Meadow (Old Field)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat"
+                                    value="agricultural field" required>
+                                <label class="form-check-label">Agricultural Field</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat"
+                                    value="public park/school grounds" required>
+                                <label class="form-check-label">Public Park/School Grounds</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="home lawn"
+                                    required>
+                                <label class="form-check-label">Home Lawn</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="garden" required>
+                                <label class="form-check-label">Garden</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="wetland edge"
+                                    required>
+                                <label class="form-check-label">Wetland Edge</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat"
+                                    value="edge between two habitats" required>
+                                <label class="form-check-label">Edge Between Two Habitats</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="habitat" value="other" required>
+                                <label class="form-check-label">Other</label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="urbanization_type" style="width:35%">
+                        <form method="POST">
+                            <!--<h5> Urbanization </h5>-->
+                            <p> How urbanized is the location where the camera was placed? </p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
+                                <label class="form-check-label">Urban</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="urbanization" value="suburban">
+                                <label class="form-check-label">Suburban</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="urbanization" value="rural">
+                                <label class="form-check-label">Rural</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="urbanization" value="wild">
+                                <label class="form-check-label">Wild</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <br>
+                <div style="display: flex; gap: 20px; align-items:flex-start;">
+                    <button type=submit id="saveHabitat"> Save Habitat </button>
+                    <p id="savehabi"></p>
+                    <span id="checkhabi" class="checkmark" style="color:green;"></span>
+                </div>
+            </div>
+
+
+            <!-- Date Section -->
+            <div id="dates" class="section">
+                <h2>Deployment Dates</h2>
+
+                <div class="mb-3">
+                    <label class="form-label">Start of Camera Deployment</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">End of Camera Deployment</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" required>
+                    <div id="dateError" style="color:red; display:none; margin-top:5px;">
+                        ! End date cannot be before start date.
+                    </div>
+                </div>
+
+                <br>
+                <div style="display: flex; gap: 20px; align-items:flex-start;">
+                    <button type=submit id="saveDates"> Save Dates </button>
+                    <p id="savedate"></p>
+                    <span id="checkdate" class="checkmark" style="color:green;"></span>
+                </div>
+            </div>
+
+
+            <!-- Location Section -->
+            <div id="location" class="section">
+                <h2> Location </h2>
+                <p> Select the location of your camera deployment by clicking on the map </p>
+                <div id="map" style="width: 100%; height: 400px"></div>
+                <!-- Make sure you put this AFTER Leaflet's CSS -->
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
+                    </script>
+                <p id="latlon" style="margin-top:15px"> </p>
+                <br>
+                <div style="display: flex; gap: 20px; align-items:flex-start;">
+                    <button type=submit id="saveLocation"> Save Location </button>
+                    <p id="saveloc"></p>
+                    <span id="checkloc" class="checkmark" style="color:green;"></span>
+                </div>
+                <script>
+                    const latlon = document.getElementById("latlon")
+                    var map = L.map('map').setView([44.597, -75.168], 10);
+
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+
+                    var marker = L.marker();
+                    var lat;
+                    var lan;
+
+                    function onMapClick(e) {
+                        // new coordinates not yet saved
+                        check = document.getElementById("checkloc")
+                        check.textContent = '';
+                        save = document.getElementById("saveloc")
+                        save.textContent = "not saved";
+                        save.style.color = "black";
+
+                        marker.setLatLng(e.latlng);
+                        marker.addTo(map);
+                        lat = e.latlng.lat;
+                        lan = e.latlng.lng;
+                        latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
+                    }
+
+                    var button = document.getElementById('saveLocation');
+
+                    function saveLocation() {
+                        // show green check and "saved"
+                        check = document.getElementById("checkloc")
+                        check.textContent = '✓';
+                        save = document.getElementById("saveloc")
+                        save.textContent = "saved";
+                        save.style.color = "green";
+
+                        // Using Fetch API
+                        fetch('/save_coordinates', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ latitude: lat, longitude: lan })
+                        })
+                            .then(response => response.json())
+                            .then(data => console.log(data))
+                            .catch(error => console.error('Error:', error));
+                    }
+
+                    map.on('click', onMapClick);
+                    button.addEventListener('click', saveLocation);
+
+                    // Example using a hidden form and submitting via GET
+                    // This would typically be inside a popup or a dedicated form
+                    var formUrl = `/save_coordinates?latitude=${lat}&longitude=${lng}`;
+                    // You could then redirect or use this URL in an anchor tag
+                    // For a POST request, you'd need a form element and submit it
+                </script>
+            </div>
+
+            <!-- Submit Section -->
+            <div id="submit" class="section">
+                <h2> Comments and Submission </h2>
+                <p>Is there anything else you'd like to share about this submission?:</p>
+                <label for="comment"></label>
+                <textarea id="comment" name="comment" rows="5" cols="40"></textarea>
+                <br><br>
+                <button type="submit" id="submitAll">Submit All</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- JS for Tabs-->
+
+    <!-- TAB SWITCHING -->
+    <script>
+        document.querySelectorAll(".tab").forEach(tab => {
+            tab.addEventListener("click", () => {
+
+                document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+
+                document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+                document.getElementById(tab.dataset.target).classList.add("active");
+                map.invalidateSize() //necessary to ensure map tiles show up properly on location tab
+            });
+        });
+    </script>
+
+
+    <!-- SUBMIT VALIDATION -->
+    <script>
+        document.getElementById("submitAll").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            const tabs = document.querySelectorAll(".tab");
+            const sections = document.querySelectorAll(".section");
+
+            let firstInvalidTab = null;
+            let formIsValid = true;
+
+            tabs.forEach(tab => tab.classList.remove("error"));
+
+            sections.forEach(section => {
+                const requiredFields = section.querySelectorAll("[required]");
+                let sectionValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value) {
+                        sectionValid = false;
+                        formIsValid = false;
+                    }
+                });
+
+                if (!sectionValid) {
+                    const tab = document.querySelector(`.tab[data-target="${section.id}"]`);
+                    tab.classList.add("error");
+
+                    if (!firstInvalidTab) firstInvalidTab = tab;
+                }
+            });
+
+            if (!formIsValid) {
+                firstInvalidTab.click();
+                return;
+            }
+
+            event.target.closest("form").submit();
+        });
+    </script>
+
+
+    <!-- AFFILIATION DROPDOWN -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const affiliationSelect = document.getElementById("affiliation_type");
+            const subContainer = document.getElementById("subAffiliationContainer");
+
+            const options = {
+                "University": ["St. Lawrence", "Clarkson", "SUNY Canton"],
+                "School": [
+                    "Canton Central",
+                    "Colton-Pierrepont Central School",
+                    "Little River Community School",
+                    "Massena Central School"
+                ]
+            };
+
+            affiliationSelect.addEventListener("change", function () {
+                const selected = this.value;
+
+                if (options[selected]) {
+                    subContainer.innerHTML = `
+                <label class="form-label">Sub-Affiliation</label>
+                <select class="form-select" id="sub_affiliation" name="sub_affiliation" required>
+                    <option value="" disabled selected>Select sub-affiliation</option>
+                </select>
+            `;
+
+                    const sel = document.getElementById("sub_affiliation");
+
+                    options[selected].forEach(opt => {
+                        const o = document.createElement("option");
+                        o.value = opt;
+                        o.textContent = opt;
+                        sel.appendChild(o);
+                    });
+                }
+                else {
+                    subContainer.innerHTML = `
+                <label class="form-label">Sub-Affiliation</label>
+                <input type="text" class="form-control" id="sub_affiliation"
+                       name="sub_affiliation" placeholder="Enter affiliation name" required>
+            `;
+                }
+            });
+
+        });
+    </script>
+
+
+    <!-- HABITAT DROPDOWN -->
+    <script>
+        const mainHabitat = document.getElementById("mainHabitat");
+        const subHabitatSelect = document.getElementById("subHabitat");
+
+        const subHabitats = [
+            "Deciduous Forest",
+            "Mixed Forest",
+            "Evergreen Forest",
+            "Plantation Forest",
+            "Natural Field or Meadow (Old Field)",
+            "Agricultural Field",
+            "Public Park/School Grounds",
+            "Home Lawn",
+            "Garden",
+            "Wetland Edge",
+            "Edge Between Two Habitats",
+            "Other"
+        ];
+
+        mainHabitat.addEventListener("change", function () {
+
+            subHabitatSelect.innerHTML = "";
+
+            const defaultOpt = document.createElement("option");
+            defaultOpt.value = "";
+            defaultOpt.textContent = "Select sub-habitat";
+            defaultOpt.disabled = true;
+            defaultOpt.selected = true;
+            subHabitatSelect.appendChild(defaultOpt);
+
+            subHabitats.forEach(hab => {
+                const o = document.createElement("option");
+                o.value = hab;
+                o.textContent = hab;
+                subHabitatSelect.appendChild(o);
+            });
+        });
+    </script>
+
+
+    <!-- DATE VALIDATION -->
+    <script>
+        const startDate = document.getElementById("start_date");
+        const endDate = document.getElementById("end_date");
+        const dateError = document.getElementById("dateError");
+
+        function validateDates() {
+
+            if (!startDate.value || !endDate.value) {
+                dateError.style.display = "none";
+                return;
+            }
+
+            if (endDate.value < startDate.value) {
+                dateError.style.display = "block";
+            } else {
+                dateError.style.display = "none";
+            }
+        }
+
+        startDate.addEventListener("change", validateDates);
+        endDate.addEventListener("change", validateDates);
+    </script>
+
+    <!-- UPLOAD SECTION -->
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileList = document.getElementById('file-list');
+        const folderInput = document.getElementById('fileElemFolder');
+        let filesToUpload = [];
+
+        dropArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
+
+        dropArea.addEventListener('dragleave', e => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+        });
+
+        dropArea.addEventListener('drop', e => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+
+            const items = e.dataTransfer.items;
+            if (items) {
+                for (const item of items) {
+                    const entry = item.webkitGetAsEntry?.();
+                    if (entry) traverseFileTree(entry);
+                }
+            }
+        });
+
+        folderInput.addEventListener('change', e => {
+            handleFiles(e.target.files);
+        });
+
+        function traverseFileTree(entry, path = "") {
+            if (entry.isFile) {
+                entry.file(file => {
+                    if (file.name.startsWith('.')) return;
+                    file.relativePath = path + file.name;
+                    filesToUpload.push(file);
+                    renderFileList();
+                    syncInputFiles();
+                });
+            } else if (entry.isDirectory) {
+                const reader = entry.createReader();
+                reader.readEntries(entries => {
+                    for (const ent of entries) {
+                        traverseFileTree(ent, path + entry.name + "/");
+                    }
+                });
+            }
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            filesToUpload.forEach((f, idx) => {
+                const row = document.createElement('div');
+                const name = document.createElement('span');
+                name.textContent = f.relativePath || f.webkitRelativePath || f.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.textContent = 'Remove';
+                removeBtn.className = 'btn btn-sm btn-outline-danger ms-2';
+                removeBtn.onclick = () => {
+                    filesToUpload.splice(idx, 1);
+                    syncInputFiles();
+                    renderFileList();
+                };
+
+                row.appendChild(name);
+                row.appendChild(removeBtn);
+                fileList.appendChild(row);
+            });
+        }
+
+        function syncInputFiles() {
+            const dt = new DataTransfer();
+            filesToUpload.forEach(f => dt.items.add(f));
+            folderInput.files = dt.files;
+        }
+
+        function handleFiles(files) {
+            filesToUpload = Array.from(files).filter(f => !f.name.startsWith('.'));
+            renderFileList();
+            syncInputFiles();
+        }
+    </script>
+
+
+</body>
+
+</html>
