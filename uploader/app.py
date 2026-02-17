@@ -3,6 +3,7 @@ import json
 from flask import Flask, render_template, request, flash, session, jsonify, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 
+
 # App Setup
 app = Flask(__name__)
 app.secret_key = "secret"
@@ -163,4 +164,3 @@ def submit_all():
 if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
-

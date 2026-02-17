@@ -12,32 +12,75 @@
     <!-- END Map Configuration -->
 
     <style>
+        /* for the background and body colour */
+        :root {
+            --green: #2f6f4e;
+            --light-green: #6fa88b;
+            --light-gray: #c0c0c0;
+            --mist-blue: #f0f7fa;
+
+            --brown: #7a5c3e;
+            --light-brown: #c9b59a;
+
+            --blue: #8fbad3;
+            --light-blue: #eaf3f8;
+
+            --white: #ffffff;
+            --gray: #4a5d51;
+            --dark: #2c2c2c;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(to bottom, var(--light-blue), var(--gray));
+            color: var(--dark);
+        }
+        .container {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 6px solid var(--green);
+        }
+
+        .app-title {
+            color: var(--brown);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 25px;
         }
 
         .tabs {
             display: flex;
-            gap: 20px;
-            background: #eee;
-            padding: 12px;
-            border-bottom: 2px solid #ccc;
+            gap: 10px;
+            background: var(--light-blue);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
         .tab {
-            padding: 10px 15px;
+            padding: 10px 16px;
             cursor: pointer;
+            border-radius: 8px;
+            background: var(--white);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background: var(--light-green);
+            color: white;
         }
 
         .tab.active {
-            border-bottom: 3px solid green;
-            font-weight: bold;
+            background: var(--green);
+            color: white;
         }
 
         .tab.error {
-            border-bottom: 3px solid red !important;
-            color: red;
-            font-weight: bold;
+            background: #f8d7da;
+            color: #842029;
         }
 
         .section {
@@ -49,17 +92,39 @@
             display: block;
         }
 
+        button {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: var(--brown);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+
         /* upload section */
         #drop-area {
-            border: 2px dashed #ccc;
-            padding: 30px;
+            border: 2px dashed var(--blue);
+            background: var(--mist-blue);
+            padding: 35px;
+            border-radius: 10px;
             text-align: center;
-            margin-bottom: 10px;
             transition: 0.3s ease;
         }
 
         #drop-area.dragover {
-            background: #eee;
+            background: var(--light-gray);
+            border-color: var(--green);
+            color: white;
         }
 
         .flash-messages {
@@ -82,12 +147,29 @@
         #file-list button {
             margin-left: 10px;
         }
+
+        input,
+        select,
+        textarea {
+           border-radius: 6px;
+           border: 1px solid #ccc;
+           padding: 8px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.15rem rgba(47,111,78,0.25);
+            outline: none;
+        }
+
     </style>
 </head>
 
 <body>
     <div class="container mt-5">
-        <h1>Nature Up North Dorsie Upload</h1>
+        <h1 class="app-title">Nature Up North Dorsie Upload</h1>
 
         <!-- Flash messages -->
         {% with messages = get_flashed_messages() %}
@@ -155,8 +237,6 @@
                 </div>
 
             </div>
-
-
 
             <!-- Affiliation Section -->
             <div id="affiliation" class="section">
