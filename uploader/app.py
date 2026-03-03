@@ -159,6 +159,9 @@ def submit_all():
     flash("All data submitted successfully!")
     return redirect("/index")
 
+@app.route("/maptest")
+def maptest():
+    return render_template("mapwithsearch.html")
 
 if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
