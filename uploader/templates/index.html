@@ -527,6 +527,71 @@
 
             <!-- Submit Section -->
             <div id="submit" class="section">
+                <h3 class="mt-4">Camera Information</h3>
+
+                <p>
+                    What number is written on the camera you borrowed from Nature Up North?
+                    <br>
+                    <small>(Choose one, or select the last option if you did not borrow a camera)</small>
+                </p>
+
+                <!-- Camera Options -->
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="camera_choice" value="1" required>
+                    <label class="form-check-label">1</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="camera_choice" value="2">
+                    <label class="form-check-label">2</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="camera_choice" value="3">
+                    <label class="form-check-label">3</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="camera_choice" value="4">
+                    <label class="form-check-label">4</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="camera_choice" value="5">
+                    <label class="form-check-label">5</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="camera_choice" value="6">
+                    <label class="form-check-label">6</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="camera_choice" value="7">
+                    <label class="form-check-label">7</label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio"
+                           name="camera_choice"
+                           value="not_borrowed"
+                           id="notBorrowed">
+                    <label class="form-check-label">
+                        I did not borrow a camera from Nature Up North
+                    </label>
+                </div>
+
+                <!-- Model Input (Hidden Initially) -->
+                <div id="cameraModelBox" class="d-none">
+                    <label class="form-label">
+                        Please enter the model/make of your trail camera:
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           id="camera_model"
+                           name="camera_model"
+                           placeholder="e.g. Bushnell Core DS">
+                </div>
                 <h2> Comments and Submission </h2>
                 <p>Is there anything else you'd like to share about this submission?:</p>
                 <label for="comment"></label>
