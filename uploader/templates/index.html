@@ -240,33 +240,87 @@
 
             <!-- Affiliation Section -->
             <div id="affiliation" class="section">
+
                 <h2>Affiliation</h2>
 
-                <!-- MAIN AFFILIATION -->
-                <div class="mb-3">
-                    <label class="form-label">Affiliation Type</label>
-                    <select class="form-select" id="affiliation_type" name="affiliation_type" required>
-                        <option value="" disabled selected>Select affiliation</option>
-                        <option value="University">University</option>
-                        <option value="School">School</option>
-                        <option value="Government">Government</option>
-                        <option value="Other">Other</option>
-                    </select>
+                <p class="mb-3 fw-semibold">
+                    Please choose one option from the following list:
+                    I am working as ...
+                </p>
+
+                <!-- OPTION 1 -->
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio"
+                           name="affiliation_type"
+                           id="affil_volunteer"
+                           value="Individual Volunteer"
+                           required>
+
+                    <label class="form-check-label" for="affil_volunteer">
+                        An individual volunteer from the community
+                    </label>
                 </div>
 
-                <!-- SUB-AFFILIATION: always enabled (2nd dropdown list) -->
-                <div class="mb-3" id="subAffiliationContainer">
-                    <label class="form-label">Sub-Affiliation</label>
-                    <input type="text" class="form-control" id="sub_affiliation" name="sub_affiliation"
-                        placeholder="Select affiliation first" required>
+                <!-- OPTION 2 -->
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio"
+                           name="affiliation_type"
+                           id="affil_k12"
+                           value="K-12 School">
+
+                    <label class="form-check-label" for="affil_k12">
+                        Part of a team from a local K-12 school
+                    </label>
                 </div>
 
-                <br>
-                <div style="display: flex; gap: 20px; align-items:flex-start;">
-                    <button type=submit id="saveAffiliation"> Save Affiliation </button>
-                    <p id="saveaffil"></p>
-                    <span id="checkaffil" class="checkmark" style="color:green;"></span>
+                <!-- OPTION 3 -->
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="affiliation_type"
+                           id="affil_college" value="College / University">
+
+                    <label class="form-check-label" for="affil_college">
+                        Part of a team from a local college/university
+                    </label>
                 </div>
+
+                <!-- OPTION 4 -->
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="affiliation_type"
+                        id="affil_org" value="Community Organization">
+
+                    <label class="form-check-label" for="affil_org">
+                        Part of a team from a community organization
+                    </label>
+
+                </div>
+                <!-- Sub-Affiliation Input -->
+                <div id="subAffiliationBox" class="d-none">
+
+                    <label class="form-label">
+                        Please enter the name of your school/organization/college:
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="sub_affiliation"
+                           name="sub_affiliation"
+                           placeholder="Enter name here"
+                           list="affiliationSuggestions">
+
+                    <datalist id="affiliationSuggestions">
+                        <option value="SUNY Canton">
+                        <option value="SUNY Potsdam">
+                        <option value="St. Lawrence University">
+                        <option value="Clarkson University">
+                        <option value="Canton Central School">
+                        <option value="Massena Central School">
+                        <option value="Colton-Pierrepont Central School">
+                        <option value="Norwood-Norfolk Central School">
+                        <option value="Potsdam Central School">
+                    </datalist>
+
+                </div>
+
             </div>
 
 
