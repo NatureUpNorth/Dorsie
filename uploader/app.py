@@ -150,6 +150,12 @@ def submit_all():
             "lon": session.get("longitude")
         },
 
+        #SAVING CAMERA MODEL
+        "camera": {
+            "choice": request.form.get("camera_choice"),
+            "model": request.form.get("camera_model")
+        },
+
         "location_name": request.form.get("location"),
         "uploaded_files": uploaded_files
     }
