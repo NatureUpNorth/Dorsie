@@ -14,7 +14,7 @@
     <style>
         /* for the background and body colour */
         :root {
-             --green: #39541e;
+            --green: #39541e;
             --light-green: #6fa88b;
             --light-gray: #c0c0c0;
             --mist-blue: #f0f7fa;
@@ -623,7 +623,23 @@
     <!-- SUBMIT VALIDATION -->
     <script>
         document.getElementById("submitAll").addEventListener("click", function (event) {
-            event.preventDefault();
+            event.preventDefault();      // prevents form from submitting immediately when submit button is clicked
+
+
+            const habitatBoxes = document.querySelectorAll(".habitat-checkbox");
+            let oneChecked = false;       // oneChecked is a flag that tracks if at least one habitat is selected
+
+            habitatBoxes.forEach(box => {
+                if (box.checked) oneChecked = true;    // if any checkbox is checked then oneChecked = true
+            });
+
+            // stops submission if no habitat is selected
+            if (!oneChecked) {
+                alert("Please select at least ONE habitat.");
+                document.querySelector('.tab[data-target="habitat"]').click();
+                return;
+            }
+
 
             const tabs = document.querySelectorAll(".tab");
             const sections = document.querySelectorAll(".section");
@@ -631,9 +647,9 @@
             let firstInvalidTab = null;
             let formIsValid = true;
 
-            tabs.forEach(tab => tab.classList.remove("error"));
+            tabs.forEach(tab => tab.classList.remove("error"));   // removes red highlighting from tabs before re-checking
 
-            sections.forEach(section => {
+            sections.forEach(section => {           // loops through each section
                 const requiredFields = section.querySelectorAll("[required]");
                 let sectionValid = true;
 
@@ -646,21 +662,20 @@
 
                 if (!sectionValid) {
                     const tab = document.querySelector(`.tab[data-target="${section.id}"]`);
-                    tab.classList.add("error");
+                    tab.classList.add("error");    // highlights the tab with an error red
 
                     if (!firstInvalidTab) firstInvalidTab = tab;
                 }
             });
 
             if (!formIsValid) {
-                firstInvalidTab.click();
+                firstInvalidTab.click();   // automatically opens the first tab with errors
                 return;
             }
 
             event.target.closest("form").submit();
         });
     </script>
-
 
     <!-- AFFILIATION DROPDOWN -->
     <script>
