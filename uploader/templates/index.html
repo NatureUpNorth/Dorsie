@@ -709,6 +709,58 @@
     });
     </script>
 
+    <!-- AFFILIATION SUGGESTIONS -->
+    <script>
+
+    const affiliationSuggestions = {
+        University: [
+            "St. Lawrence University",
+            "Clarkson University",
+            "SUNY Canton",
+            "SUNY Potsdam"
+        ],
+
+        School: [
+            "Canton Central School",
+            "Massena Central School",
+            "Colton-Pierrepont Central School",
+            "Norwood-Norfolk Central School",
+            "Potsdam Central School"
+        ],
+
+        Other: [
+            "Nature Up North",
+            "Adirondack Park Agency"
+        ]
+    };
+
+    const affiliationType = document.getElementById("affiliation_type");
+    const datalist = document.getElementById("affiliationSuggestions");
+
+    affiliationType.addEventListener("change", function () {
+
+        const selected = this.value;
+
+        datalist.innerHTML = "";
+
+        if (affiliationSuggestions[selected]) {
+
+            affiliationSuggestions[selected].forEach(name => {
+
+                const option = document.createElement("option");
+                option.value = name;
+
+                datalist.appendChild(option);
+
+            });
+
+        }
+
+    });
+
+    </script>
+
+
 
     <!-- HABITAT DROPDOWN -->
     <script>
