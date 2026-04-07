@@ -3,6 +3,8 @@ import json
 from flask import Flask, render_template, request, flash, session, jsonify, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 
+from PIL import Image
+from PIL.ExifTags import TAGS
 
 # App Setup
 app = Flask(__name__)
@@ -116,6 +118,22 @@ def upload_files():
     session["files"] = saved_files
     return jsonify({"status": "ok", "files": saved_files})
 
+def get_exif_data(filepath):
+    try:
+        image = Image.open(filepath)
+        exif_data = image._getexif()
+        if not exif_data:
+            return {}
+        readable = {}
+        for tag_id, value in exif_data.items():
+            tag = TAGS.get(tag_id, tag_id)
+            if isinstance(value, bytes):
+                continue
+            readable[tag] = str(value)
+        return readable
+    except Exception:
+        return {}
+
 
 @app.route("/submit_all", methods=["POST"])
 @login_required
@@ -125,38 +143,49 @@ def submit_all():
     uploaded_files = []
     files = request.files.getlist("file")
     for f in files:
-        if f and f.filename:
-            save_path = os.path.join("uploads", f.filename)
+        if f and f.filename and allowed_file(f.filename):
+            # build the new filename
+            start_date = request.form.get("start_date", "unknown-date")
+            location = request.form.get("location", "unknown-location")
+            location_clean = location.strip().lower().replace(" ", "-")
+            original_name = os.path.basename(f.filename)
+            new_filename = f"{start_date}_{location_clean}_{original_name}"
+
+            # keep the subfolder structure but use the new filename
+            subfolder = os.path.dirname(f.filename)
+            save_path = os.path.join("uploads", subfolder, new_filename) if subfolder else os.path.join("uploads", new_filename)
+
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
             f.save(save_path)
-            uploaded_files.append(f.filename)
+
+            exif = get_exif_data(save_path)
+            uploaded_files.append({
+                "filename": new_filename,
+                "original_filename": original_name,
+                "filepath": save_path,
+                "exif": exif
+            })
+
+    # fall back to form-submitted hidden inputs if session coords not set
+    lat = session.get("latitude") or request.form.get("latitude")
+    lon = session.get("longitude") or request.form.get("longitude")
 
     record = {
         "affiliation": {
             "type": request.form.get("affiliation_type"),
             "sub": request.form.get("sub_affiliation")
         },
-        "habitat": {
-            "type": request.form.get("mainHabitat"),
-            "sub": request.form.get("subHabitat")
-        },
+        "habitat": request.form.getlist("habitat"),
+        "urbanization": request.form.get("urbanization"),
         "dates": {
             "start_date": request.form.get("start_date"),
             "end_date": request.form.get("end_date")
         },
-
-        #SAVING LATITUDE AND LONGITUDE FROM MAP
         "coordinates": {
-            "lat": session.get("latitude"),
-            "lon": session.get("longitude")
+            "lat": lat,
+            "lon": lon
         },
-
-        #SAVING CAMERA MODEL
-        "camera": {
-            "choice": request.form.get("camera_choice"),
-            "model": request.form.get("camera_model")
-        },
-
-        "location_name": request.form.get("location"),
+        "comment": request.form.get("comment"),
         "uploaded_files": uploaded_files
     }
 
@@ -165,7 +194,6 @@ def submit_all():
 
     flash("All data submitted successfully!")
     return redirect("/index")
-
 
 if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
