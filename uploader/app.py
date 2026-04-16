@@ -3,6 +3,7 @@ import json
 from flask import Flask, render_template, request, flash, session, jsonify, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 
+
 # App Setup
 app = Flask(__name__)
 app.secret_key = "secret"
@@ -149,6 +150,12 @@ def submit_all():
             "lon": session.get("longitude")
         },
 
+        #SAVING CAMERA MODEL
+        "camera": {
+            "choice": request.form.get("camera_choice"),
+            "model": request.form.get("camera_model")
+        },
+
         "location_name": request.form.get("location"),
         "uploaded_files": uploaded_files
     }
@@ -166,4 +173,3 @@ def maptest():
 if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
-
