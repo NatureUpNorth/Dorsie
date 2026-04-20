@@ -9,32 +9,73 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
     <style>
+        /* NUN color palette */
+        :root {
+            --green: #39541e;
+            --light-green: #6fa88b;
+            --light-gray: #c0c0c0;
+            --mist-blue: #f0f7fa;
+            --brown: #543b1f;
+            --light-brown: #c9b59a;
+            --blue: #165970;
+            --light-blue: #eaf3f8;
+            --white: #ffffff;
+            --gray: #4a5d51;
+            --dark: #2c2c2c;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(to bottom, var(--light-blue), var(--gray));
+            color: var(--dark);
+        }
+
+        .container {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 6px solid var(--green);
+        }
+
+        .app-title {
+            color: var(--brown);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 25px;
         }
 
         .tabs {
             display: flex;
-            gap: 20px;
-            background: #eee;
-            padding: 12px;
-            border-bottom: 2px solid #ccc;
+            gap: 5px;
+            background: var(--light-blue);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: -1px;
         }
 
         .tab {
-            padding: 10px 15px;
+            padding: 10px 20px;
             cursor: pointer;
+            border-radius: 8px;
+            background: var(--white);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background: var(--light-green);
+            color: white;
         }
 
         .tab.active {
-            border-bottom: 3px solid green;
-            font-weight: bold;
+            background: var(--green);
+            color: white;
         }
 
         .tab.error {
-            border-bottom: 3px solid red !important;
-            color: red;
-            font-weight: bold;
+            background: #f8d7da;
+            color: #842029;
         }
 
         .section {
@@ -46,26 +87,44 @@
             display: block;
         }
 
+        button {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: var(--brown);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        /* Upload section */
         #drop-area {
-            border: 2px dashed #ccc;
-            padding: 30px;
+            border: 2px dashed var(--blue);
+            background: var(--mist-blue);
+            padding: 35px;
+            border-radius: 10px;
             text-align: center;
-            margin-bottom: 10px;
             transition: 0.3s ease;
         }
 
         #drop-area.dragover {
-            background: #eee;
+            background: var(--light-gray);
+            border-color: var(--green);
         }
 
         .flash-messages {
             color: green;
             list-style: none;
             padding-left: 0;
-        }
-
-        .flash-messages li {
-            margin-bottom: 4px;
         }
 
         #file-list div {
@@ -79,24 +138,16 @@
             margin-left: 10px;
         }
 
-        #file-list .btn {
-            padding: 2px 8px;
-            font-size: 0.85rem;
+        input, select, textarea {
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            padding: 8px;
         }
 
-        #file-list .btn-outline-secondary {
-            color: #555;
-            border-color: #bbb;
-        }
-
-        #file-list .btn-outline-secondary:hover {
-            background-color: #f0f0f0;
-            border-color: #999;
-        }
-
-        .file-buttons {
-            display: flex;
-            align-items: center;
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 0.15rem rgba(47,111,78,0.25);
+            outline: none;
         }
 
         .preview-modal {
@@ -113,7 +164,7 @@
             max-width: 100%;
             max-height: 100%;
             border-radius: 4px;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 25px rgba(0,0,0,0.7);
         }
 
         .close-preview {
@@ -126,15 +177,13 @@
             font-weight: bold;
         }
 
-        .close-preview:hover {
-            color: #ccc;
-        }
+        .close-preview:hover { color: #ccc; }
     </style>
 </head>
 
 <body>
     <div class="container mt-5">
-        <h1>Nature Up North Dorsie Upload</h1>
+        <h1 class="app-title">Nature Up North Dorsie Upload</h1>
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -157,59 +206,95 @@
         <!-- ONE FORM wrapping all sections -->
         <form id="mainForm" action="/submit_all" method="POST" enctype="multipart/form-data">
 
-            <!-- Upload Section -->
+            <!-- UPLOAD SECTION -->
             <div id="upload" class="section active">
                 <h2>Upload Files</h2>
-                <div id="drop-area" class="p-4 mb-3 border border-dashed text-center">
-                    <p>Drag & drop your folder here</p>
-                    <button type="button" class="btn btn-primary me-2"
-                        onclick="document.getElementById('fileElemFolder').click();">
+                <div id="drop-area" class="p-4 mb-3">
+                    <p>Drag &amp; drop your folder here</p>
+                    <button type="button" onclick="document.getElementById('fileElemFolder').click();">
                         Select Folder
                     </button>
-                    <!-- visible folder picker (for browsing only) -->
-                    <input type="file" id="fileElemFolder" webkitdirectory directory accept="image/*,video/*,audio/*"
-                        style="display: none;">
 
-                    <!-- hidden input that actually submits the files -->
-                    <input type="file" id="fileSubmit" name="file" multiple style="display: none;">
+                    <!-- Visible folder picker -->
+                    <input type="file" id="fileElemFolder" webkitdirectory directory
+                        accept="image/*,video/*,audio/*" style="display:none;">
+
+                    <!-- Hidden input that actually submits with the form -->
+                    <input type="file" id="fileSubmit" name="file" multiple style="display:none;">
                 </div>
                 <div id="file-list"></div>
+
+                <!-- Image preview modal -->
                 <div id="imagePreviewModal" class="preview-modal">
                     <span class="close-preview">&times;</span>
                     <img id="previewImage" />
                 </div>
             </div>
 
-            <!-- Affiliation Section -->
+            <!-- AFFILIATION SECTION -->
             <div id="affiliation" class="section">
                 <h2>Affiliation</h2>
-                <div class="mb-3">
-                    <label class="form-label">Affiliation Type</label>
-                    <select class="form-select" id="affiliation_type" name="affiliation_type" required>
-                        <option value="" disabled selected>Select affiliation</option>
-                        <option value="University">University</option>
-                        <option value="School">School</option>
-                        <option value="Government">Government</option>
-                        <option value="Other">Other</option>
-                    </select>
+                <p class="mb-3 fw-semibold">Please choose one option: I am working as …</p>
+
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="affiliation_type"
+                           id="affil_volunteer" value="Individual Volunteer" required>
+                    <label class="form-check-label" for="affil_volunteer">
+                        An individual volunteer from the community
+                    </label>
                 </div>
-                <div class="mb-3" id="subAffiliationContainer">
-                    <label class="form-label">Sub-Affiliation</label>
-                    <input type="text" class="form-control" id="sub_affiliation" name="sub_affiliation"
-                        placeholder="Select affiliation first" required>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="affiliation_type"
+                           id="affil_k12" value="K-12 School">
+                    <label class="form-check-label" for="affil_k12">
+                        Part of a team from a local K-12 school
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="affiliation_type"
+                           id="affil_college" value="College / University">
+                    <label class="form-check-label" for="affil_college">
+                        Part of a team from a local college/university
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="affiliation_type"
+                           id="affil_org" value="Community Organization">
+                    <label class="form-check-label" for="affil_org">
+                        Part of a team from a community organization
+                    </label>
+                </div>
+
+                <!-- Sub-affiliation input with autocomplete -->
+                <div id="subAffiliationBox" class="d-none mt-3">
+                    <label class="form-label">
+                        Please enter the name of your school/organization/college:
+                    </label>
+                    <input type="text" class="form-control" id="sub_affiliation"
+                           name="sub_affiliation" placeholder="Enter name here"
+                           list="affiliationSuggestions">
+                    <datalist id="affiliationSuggestions">
+                        <option value="SUNY Canton">
+                        <option value="SUNY Potsdam">
+                        <option value="St. Lawrence University">
+                        <option value="Clarkson University">
+                        <option value="Canton Central School">
+                        <option value="Massena Central School">
+                        <option value="Colton-Pierrepont Central School">
+                        <option value="Norwood-Norfolk Central School">
+                        <option value="Potsdam Central School">
+                    </datalist>
                 </div>
             </div>
 
-            <!-- Habitat Section -->
-            <!-- FIX: removed nested <form> tags — everything is already inside the main form -->
+            <!-- HABITAT SECTION -->
             <div id="habitat" class="section">
                 <h2>Habitat and Urbanization</h2>
-                <div class="form-container"
-                    style="display:flex; justify-content:left; align-items:flex-start; gap:20%;">
+                <div style="display:flex; justify-content:left; align-items:flex-start; gap:20%;">
 
-                    <div id="habitat_type" style="margin-left:5%; width:35%">
-                        <p>Which of the following terms would characterize the habitat in the location where the
-                            camera was placed? (check all that apply)</p>
+                    <div style="margin-left:5%; width:35%">
+                        <p>Which terms characterize the habitat where the camera was placed?
+                           (check all that apply)</p>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="habitat" value="deciduous forest">
                             <label class="form-check-label">Deciduous Forest</label>
@@ -235,8 +320,7 @@
                             <label class="form-check-label">Agricultural Field</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="habitat"
-                                value="public park/school grounds">
+                            <input class="form-check-input" type="checkbox" name="habitat" value="public park/school grounds">
                             <label class="form-check-label">Public Park/School Grounds</label>
                         </div>
                         <div class="form-check">
@@ -252,8 +336,7 @@
                             <label class="form-check-label">Wetland Edge</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="habitat"
-                                value="edge between two habitats">
+                            <input class="form-check-input" type="checkbox" name="habitat" value="edge between two habitats">
                             <label class="form-check-label">Edge Between Two Habitats</label>
                         </div>
                         <div class="form-check">
@@ -262,7 +345,7 @@
                         </div>
                     </div>
 
-                    <div id="urbanization_type" style="width:35%">
+                    <div style="width:35%">
                         <p>How urbanized is the location where the camera was placed?</p>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
@@ -284,7 +367,7 @@
                 </div>
             </div>
 
-            <!-- Date Section -->
+            <!-- DATE SECTION -->
             <div id="dates" class="section">
                 <h2>Deployment Dates</h2>
                 <div class="mb-3">
@@ -300,28 +383,54 @@
                 </div>
             </div>
 
-            <!-- Location Section -->
+            <!-- LOCATION SECTION -->
             <div id="location" class="section">
                 <h2>Location</h2>
-                <p>Select the location of your camera deployment by clicking on the map</p>
-                <div id="map" style="width:100%; height:400px"></div>
+                <p>Select the location of your camera deployment by clicking on the map.</p>
+                <div id="map" style="width:100%; height:400px;"></div>
                 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
                     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-                <p id="latlon" style="margin-top:15px"></p>
+                <p id="latlon" style="margin-top:15px;"></p>
                 <div style="display:flex; gap:20px; align-items:flex-start;">
                     <button type="button" id="saveLocation">Save Location</button>
                     <p id="saveloc"></p>
-                    <span id="checkloc" class="checkmark" style="color:green;"></span>
+                    <span id="checkloc" style="color:green;"></span>
                 </div>
-                <!-- FIX: hidden inputs so lat/lon travel with the form submission too -->
+                <!-- Hidden inputs so lat/lon travel with form submission -->
                 <input type="hidden" id="latitude_input" name="latitude">
                 <input type="hidden" id="longitude_input" name="longitude">
             </div>
 
-            <!-- Submit Section -->
+            <!-- SUBMIT SECTION -->
             <div id="submit" class="section">
+                <h3 class="mt-4">Camera Information</h3>
+                <p>
+                    What number is written on the camera you borrowed from Nature Up North?<br>
+                    <small>(Choose one, or select the last option if you did not borrow a camera)</small>
+                </p>
+
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="1" required><label class="form-check-label">1</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="2"><label class="form-check-label">2</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="3"><label class="form-check-label">3</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="4"><label class="form-check-label">4</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="5"><label class="form-check-label">5</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="6"><label class="form-check-label">6</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="7"><label class="form-check-label">7</label></div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="camera_choice"
+                           value="not_borrowed" id="notBorrowed">
+                    <label class="form-check-label">I did not borrow a camera from Nature Up North</label>
+                </div>
+
+                <!-- Camera model input (shown only when "not borrowed") -->
+                <div id="cameraModelBox" class="d-none mb-3">
+                    <label class="form-label">Please enter the model/make of your trail camera:</label>
+                    <input type="text" class="form-control" id="camera_model"
+                           name="camera_model" placeholder="e.g. Bushnell Core DS">
+                </div>
+
                 <h2>Comments and Submission</h2>
-                <p>Is there anything else you'd like to share about this submission?:</p>
+                <p>Is there anything else you'd like to share about this submission?</p>
                 <textarea id="comment" name="comment" rows="5" cols="40"></textarea>
                 <br><br>
                 <button type="submit" id="submitAll">Submit All</button>
@@ -332,7 +441,6 @@
 
     <!-- TAB SWITCHING -->
     <script>
-        // FIX: guard map.invalidateSize() so it only runs after map exists
         let mapInitialized = false;
 
         document.querySelectorAll(".tab").forEach(tab => {
@@ -341,6 +449,7 @@
                 tab.classList.add("active");
                 document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
                 document.getElementById(tab.dataset.target).classList.add("active");
+                // Only call invalidateSize after the map exists
                 if (mapInitialized) map.invalidateSize();
             });
         });
@@ -367,7 +476,7 @@
             marker.setLatLng(e.latlng).addTo(map);
             lat = e.latlng.lat;
             lan = e.latlng.lng;
-            latlon.textContent = 'Latitude: ' + lat + ' Longitude: ' + lan;
+            latlon.textContent = 'Latitude: ' + lat + '  Longitude: ' + lan;
         }
 
         map.on('click', onMapClick);
@@ -377,19 +486,19 @@
             document.getElementById("saveloc").textContent = "saved";
             document.getElementById("saveloc").style.color = "green";
 
-            // FIX: populate hidden inputs so lat/lon submit with the main form
+            // Populate hidden inputs so lat/lon submit with the form
             document.getElementById("latitude_input").value = lat;
             document.getElementById("longitude_input").value = lan;
 
-            // Also save to session via fetch (keeps your existing backend logic)
+            // Also persist to session via fetch
             fetch('/save_coordinates', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ latitude: lat, longitude: lan })
             })
-                .then(r => r.json())
-                .then(d => console.log(d))
-                .catch(e => console.error(e));
+            .then(r => r.json())
+            .then(d => console.log(d))
+            .catch(e => console.error(e));
         });
     </script>
 
@@ -409,8 +518,12 @@
                 let sectionValid = true;
 
                 requiredFields.forEach(field => {
-                    // Handle checkboxes: check if at least one in the group is checked
-                    if (field.type === "checkbox") {
+                    if (field.type === "radio") {
+                        // Check if any radio in this group is selected
+                        const name = field.name;
+                        const anySelected = section.querySelector(`input[name="${name}"]:checked`);
+                        if (!anySelected) sectionValid = false;
+                    } else if (field.type === "checkbox") {
                         const name = field.name;
                         const anyChecked = section.querySelector(`input[name="${name}"]:checked`);
                         if (!anyChecked) sectionValid = false;
@@ -438,37 +551,24 @@
         });
     </script>
 
-    <!-- AFFILIATION DROPDOWN -->
+    <!-- AFFILIATION RADIO LOGIC -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const affiliationSelect = document.getElementById("affiliation_type");
-            const subContainer = document.getElementById("subAffiliationContainer");
+            const radios = document.querySelectorAll('input[name="affiliation_type"]');
+            const subBox = document.getElementById("subAffiliationBox");
+            const subInput = document.getElementById("sub_affiliation");
 
-            const options = {
-                "University": ["St. Lawrence", "Clarkson", "SUNY Canton"],
-                "School": ["Canton Central", "Colton-Pierrepont Central School", "Little River Community School", "Massena Central School"]
-            };
-
-            affiliationSelect.addEventListener("change", function () {
-                const selected = this.value;
-                if (options[selected]) {
-                    subContainer.innerHTML = `
-                    <label class="form-label">Sub-Affiliation</label>
-                    <select class="form-select" id="sub_affiliation" name="sub_affiliation" required>
-                        <option value="" disabled selected>Select sub-affiliation</option>
-                    </select>`;
-                    const sel = document.getElementById("sub_affiliation");
-                    options[selected].forEach(opt => {
-                        const o = document.createElement("option");
-                        o.value = opt; o.textContent = opt;
-                        sel.appendChild(o);
-                    });
-                } else {
-                    subContainer.innerHTML = `
-                    <label class="form-label">Sub-Affiliation</label>
-                    <input type="text" class="form-control" id="sub_affiliation"
-                        name="sub_affiliation" placeholder="Enter affiliation name" required>`;
-                }
+            radios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.value === "Individual Volunteer") {
+                        subBox.classList.add("d-none");
+                        subInput.value = "";
+                        subInput.required = false;
+                    } else {
+                        subBox.classList.remove("d-none");
+                        subInput.required = true;
+                    }
+                });
             });
         });
     </script>
@@ -536,9 +636,9 @@
                 const name = document.createElement('span');
                 name.textContent = f.relativePath || f.webkitRelativePath || f.name;
 
+                // Preview button for images (first 5)
                 let previewBtn = null;
-                // preview the first two images, change this to 5 later
-                if (f.type.startsWith("image/") && idx < 2) {
+                if (f.type.startsWith("image/") && idx < 5) {
                     previewBtn = document.createElement('button');
                     previewBtn.type = 'button';
                     previewBtn.textContent = 'Preview';
@@ -550,22 +650,27 @@
                 removeBtn.type = 'button';
                 removeBtn.textContent = 'Remove';
                 removeBtn.className = 'btn btn-sm btn-outline-danger ms-2';
-                removeBtn.onclick = () => { filesToUpload.splice(idx, 1); syncInputFiles(); renderFileList(); };
+                removeBtn.onclick = () => {
+                    filesToUpload.splice(idx, 1);
+                    syncInputFiles();
+                    renderFileList();
+                };
 
                 const buttonGroup = document.createElement('div');
-                buttonGroup.className = "file-buttons";
+                buttonGroup.className = "file-buttons d-flex align-items-center";
                 if (previewBtn) buttonGroup.appendChild(previewBtn);
                 buttonGroup.appendChild(removeBtn);
-                row.appendChild(name); row.appendChild(buttonGroup);
+                row.appendChild(name);
+                row.appendChild(buttonGroup);
                 fileList.appendChild(row);
             });
         }
 
+        // sync files to the hidden submit input so they travel with the form
         function syncInputFiles() {
             const dt = new DataTransfer();
             filesToUpload.forEach(f => dt.items.add(f));
             folderInput.files = dt.files;
-            // sync to the submit input as well
             document.getElementById("fileSubmit").files = dt.files;
         }
 
@@ -575,6 +680,7 @@
             syncInputFiles();
         }
 
+        // Image preview modal
         function previewImage(file) {
             const modal = document.getElementById("imagePreviewModal");
             const img = document.getElementById("previewImage");
@@ -598,6 +704,27 @@
         };
     </script>
 
-</body>
+    <!--CAMERA MODEL -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const radios = document.querySelectorAll('input[name="camera_choice"]');
+            const modelBox = document.getElementById("cameraModelBox");
+            const modelInput = document.getElementById("camera_model");
 
+            radios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.value === "not_borrowed") {
+                        modelBox.classList.remove("d-none");
+                        modelInput.required = true;
+                    } else {
+                        modelBox.classList.add("d-none");
+                        modelInput.value = "";
+                        modelInput.required = false;
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
 </html>

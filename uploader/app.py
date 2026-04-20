@@ -118,6 +118,7 @@ def upload_files():
     session["files"] = saved_files
     return jsonify({"status": "ok", "files": saved_files})
 
+# EXIF extraction helper
 def get_exif_data(filepath):
     try:
         image = Image.open(filepath)
@@ -144,20 +145,21 @@ def submit_all():
     files = request.files.getlist("file")
     for f in files:
         if f and f.filename and allowed_file(f.filename):
-            # build the new filename
+            # Build renamed filename: {start_date}_{location}_{original_name}
             start_date = request.form.get("start_date", "unknown-date")
             location = request.form.get("location", "unknown-location")
             location_clean = location.strip().lower().replace(" ", "-")
             original_name = os.path.basename(f.filename)
             new_filename = f"{start_date}_{location_clean}_{original_name}"
 
-            # keep the subfolder structure but use the new filename
+            # Preserve subfolder structure but use new filename
             subfolder = os.path.dirname(f.filename)
             save_path = os.path.join("uploads", subfolder, new_filename) if subfolder else os.path.join("uploads", new_filename)
 
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            os.makedirs(os.path.dirname(save_path) if os.path.dirname(save_path) else "uploads", exist_ok=True)
             f.save(save_path)
 
+            # Extract EXIF for images
             exif = get_exif_data(save_path)
             uploaded_files.append({
                 "filename": new_filename,
@@ -166,7 +168,7 @@ def submit_all():
                 "exif": exif
             })
 
-    # fall back to form-submitted hidden inputs if session coords not set
+    # Fall back to form-submitted hidden inputs if session coords not set
     lat = session.get("latitude") or request.form.get("latitude")
     lon = session.get("longitude") or request.form.get("longitude")
 
@@ -185,6 +187,11 @@ def submit_all():
             "lat": lat,
             "lon": lon
         },
+        "camera": {
+            "choice": request.form.get("camera_choice"),
+            "model": request.form.get("camera_model") 
+        },
+        "location_name": request.form.get("location"),
         "comment": request.form.get("comment"),
         "uploaded_files": uploaded_files
     }
