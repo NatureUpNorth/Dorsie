@@ -166,7 +166,6 @@ def submit_all():
     flash("All data submitted successfully!")
     return redirect("/index")
 
-
 if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
