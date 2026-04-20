@@ -166,6 +166,82 @@
         }
 
     </style>
+
+    <!-- map section -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .location-container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 200px);
+        }
+
+        .map-section {
+            flex: 1;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .results-sidebar {
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            display: none;
+        }
+
+        .results-sidebar.active {
+            display: block;
+        }
+
+        .result-item {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .result-item:hover {
+            background-color: #e8f4f8;
+        }
+
+        .result-item.selected {
+            background-color: #cce5ff;
+            border-left: 4px solid #0066cc;
+            padding-left: 8px;
+        }
+
+        .result-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .result-address {
+            font-size: 0.85em;
+            color: #666;
+            word-wrap: break-word;
+        }
+
+        #location {
+            padding: 20px;
+        }
+
+        .controls-section {
+            margin-top: 20px;
+        }
+     </style>
 </head>
 
 <body>
@@ -450,81 +526,218 @@
 
             <!-- Location Section -->
             <div id="location" class="section">
-                <h2> Location </h2>
-                <p> Select the location of your camera deployment by clicking on the map </p>
-                <div id="map" style="width: 100%; height: 400px"></div>
+                <h2>Location</h2>
+                <div class="search-container">
+                    <input
+                        id="searchInput"
+                        type="text"
+                        class="form-control"
+                        placeholder="Search address or location..."
+                        style="margin-bottom: 10px;">
+                </div>
+
+                <div class="location-container">
+                    <div class="map-section">
+                        <div id="map"></div>
+                    </div>
+                    <div id="resultsSidebar" class="results-sidebar"></div>
+                </div>
+
                 <!-- Make sure you put this AFTER Leaflet's CSS -->
                 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-                    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
-                    </script>
-                <p id="latlon" style="margin-top:15px"> </p>
-                <br>
-                <div style="display: flex; gap: 20px; align-items:flex-start;">
-                    <button type=submit id="saveLocation"> Save Location </button>
-                    <p id="saveloc"></p>
-                    <span id="checkloc" class="checkmark" style="color:green;"></span>
-                </div>
-                <script>
-                    const latlon = document.getElementById("latlon")
-                    var map = L.map('map').setView([44.597, -75.168], 10);
-
-                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    }).addTo(map);
-
-                    var marker = L.marker();
-                    var lat;
-                    var lan;
-
-                    function onMapClick(e) {
-                        // new coordinates not yet saved
-                        check = document.getElementById("checkloc")
-                        check.textContent = '';
-                        save = document.getElementById("saveloc")
-                        save.textContent = "not saved";
-                        save.style.color = "black";
-
-                        marker.setLatLng(e.latlng);
-                        marker.addTo(map);
-                        lat = e.latlng.lat;
-                        lan = e.latlng.lng;
-                        latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
-                    }
-
-                    var button = document.getElementById('saveLocation');
-
-                    function saveLocation() {
-                        // show green check and "saved"
-                        check = document.getElementById("checkloc")
-                        check.textContent = '✓';
-                        save = document.getElementById("saveloc")
-                        save.textContent = "saved";
-                        save.style.color = "green";
-
-                        // Using Fetch API
-                        fetch('/save_coordinates', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ latitude: lat, longitude: lan })
-                        })
-                            .then(response => response.json())
-                            .then(data => console.log(data))
-                            .catch(error => console.error('Error:', error));
-                    }
-
-                    map.on('click', onMapClick);
-                    button.addEventListener('click', saveLocation);
-
-                    // Example using a hidden form and submitting via GET
-                    // This would typically be inside a popup or a dedicated form
-                    var formUrl = `/save_coordinates?latitude=${lat}&longitude=${lng}`;
-                    // You could then redirect or use this URL in an anchor tag
-                    // For a POST request, you'd need a form element and submit it
+                   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+                   crossorigin="">
                 </script>
+                <script src="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.js"></script>
+
+                <p id="latlon">Select your location by clicking on the map or search results</p>
+                <div class="controls-section" style="display: flex; gap: 20px;">
+                    <button type="submit" id="saveCoordinates">SAVE COORDINATES</button>
+                    <p id="save"></p>
+                    <span id="check" class="checkmark" style="color: green;"></span>
+                </div>
             </div>
+
+            <script>
+                const latlon = document.getElementById("latlon");
+                const resultsSidebar = document.getElementById("resultsSidebar");
+                var map = L.map('map').setView([44.597, -75.168], 10);
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                var marker = L.marker();
+                var lat;
+                var lan;
+                var currentSearchResults = [];
+                var selectedResultIndex = -1;
+
+                // Nominatim Search Bar Setup
+                function searchAddress() {
+                    const searchInput = document.getElementById("searchInput").value;
+
+                    if (searchInput.trim() === "") {
+                        alert("Please enter an address");
+                        return;
+                    }
+
+                    // Clear previous search status
+                    let check = document.getElementById("check");
+                    check.textContent = '';
+                    let save = document.getElementById("save");
+                    save.textContent = " not saved";
+                    save.style.color = "black";
+
+                    // Call Nominatim API
+                    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(searchInput) + '&limit=8')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                // Store results
+                                currentSearchResults = data;
+                                selectedResultIndex = -1;
+
+                                // Display results in sidebar
+                                displaySearchResults(data);
+
+                                // Auto-zoom to first result bounds
+                                const firstResult = data[0];
+                                const bounds = [
+                                    [parseFloat(firstResult.boundingbox[0]), parseFloat(firstResult.boundingbox[2])],
+                                    [parseFloat(firstResult.boundingbox[1]), parseFloat(firstResult.boundingbox[3])]
+                                ];
+                                map.fitBounds(bounds);
+                            } else {
+                                alert("Address not found. Please try another search.");
+                                resultsSidebar.classList.remove('active');
+                                resultsSidebar.innerHTML = '';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("Error searching address. Please try again.");
+                        });
+                }
+
+                // Display search results in sidebar
+                function displaySearchResults(results) {
+                    resultsSidebar.innerHTML = '';
+                    resultsSidebar.classList.add('active');
+
+                    results.forEach((result, index) => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'result-item';
+                        resultItem.innerHTML = `
+                            <div class="result-name">${result.name}</div>
+                            <div class="result-address">${result.display_name}</div>
+                        `;
+
+                        resultItem.addEventListener('click', () => selectResult(index, result));
+                        resultsSidebar.appendChild(resultItem);
+                    });
+                }
+
+                // Handle result selection
+                function selectResult(index, result) {
+                    const latitude = parseFloat(result.lat);
+                    const longitude = parseFloat(result.lon);
+
+                    // Update selected state
+                    selectedResultIndex = index;
+                    updateSelectedResultUI();
+
+                    // Update map view
+                    map.setView([latitude, longitude], 14);
+
+                    // Update marker
+                    marker.setLatLng([latitude, longitude]);
+                    marker.addTo(map);
+
+                    // Update coordinates
+                    lat = latitude;
+                    lan = longitude;
+                    latlon.textContent = 'Latitude: ' + latitude.toString() + ' Longitude: ' + longitude.toString();
+
+                    // Clear unsaved status
+                    let check = document.getElementById("check");
+                    check.textContent = '';
+                    let save = document.getElementById("save");
+                    save.textContent = " not saved";
+                    save.style.color = "black";
+                }
+
+                // Update UI to show selected result
+                function updateSelectedResultUI() {
+                    const resultItems = resultsSidebar.querySelectorAll('.result-item');
+                    resultItems.forEach((item, index) => {
+                        if (index === selectedResultIndex) {
+                            item.classList.add('selected');
+                        } else {
+                            item.classList.remove('selected');
+                        }
+                    });
+                }
+
+                // Allow Enter key to trigger search (no longer moves marker automatically)
+                document.getElementById("searchInput").addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        searchAddress();
+                    }
+                });
+
+                function onMapClick(e) {
+                    // new coordinates not yet saved
+                    let check = document.getElementById("check");
+                    check.textContent = '';
+                    let save = document.getElementById("save");
+                    save.textContent = " not saved";
+                    save.style.color = "black";
+
+                    marker.setLatLng(e.latlng);
+                    marker.addTo(map);
+                    lat = e.latlng.lat;
+                    lan = e.latlng.lng;
+                    latlon.textContent = 'Latitude: ' + e.latlng.lat.toString() + ' Longitude: ' + e.latlng.lng.toString();
+
+                    // Clear search input when clicking map
+                    document.getElementById("searchInput").value = '';
+
+                    // Close results sidebar and clear selection
+                    resultsSidebar.classList.remove('active');
+                    resultsSidebar.innerHTML = '';
+                    selectedResultIndex = -1;
+                    currentSearchResults = [];
+                }
+
+                var button = document.getElementById('saveCoordinates');
+
+                function saveLocation() {
+                    // show green check and "saved"
+                    let check = document.getElementById("check");
+                    check.textContent = '✓';
+                    let save = document.getElementById("save");
+                    save.textContent = "saved";
+                    save.style.color = "green";
+
+                    // Using Fetch API
+                    fetch('/save_coordinates', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ latitude: lat, longitude: lan})
+                    })
+                        .then(response => response.json())
+                        .then(data => console.log(data))
+                        .catch(error => console.error('Error:', error));
+                }
+
+                map.on('click', onMapClick);
+                button.addEventListener('click', saveLocation);
+
+            </script>
 
             <!-- Submit Section -->
             <div id="submit" class="section">
