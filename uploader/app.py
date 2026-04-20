@@ -72,7 +72,7 @@ def allowed_file(filename):
 @app.route("/index")
 @login_required
 def index():
-    return render_template("indexcopy.html")
+    return render_template("index.html")
 
 if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
