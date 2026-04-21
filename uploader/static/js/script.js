@@ -316,3 +316,28 @@
             renderFileList();
             syncInputFiles();
         }
+
+    <!-- CAMERA MODEL -->
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const radios = document.querySelectorAll('input[name="camera_choice"]');
+        const modelBox = document.getElementById("cameraModelBox");
+        const modelInput = document.getElementById("camera_model");
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", function () {
+
+                if (this.value === "not_borrowed") {
+                    modelBox.classList.remove("d-none");
+                    modelInput.required = true;
+                } else {
+                    modelBox.classList.add("d-none");
+                    modelInput.value = "";
+                    modelInput.required = false;
+                }
+
+            });
+        });
+
+    });
