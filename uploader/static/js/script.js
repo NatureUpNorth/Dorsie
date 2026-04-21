@@ -15,8 +15,23 @@
 
 
     <!-- SUBMIT VALIDATION -->
-        document.getElementById("submitAll").addEventListener("click", function (event) {
-            event.preventDefault();
+            document.getElementById("submitAll").addEventListener("click", function (event) {
+            event.preventDefault();      // prevents form from submitting immediately when submit button is clicked
+
+
+            const habitatBoxes = document.querySelectorAll(".habitat-checkbox");
+            let oneChecked = false;       // oneChecked is a flag that tracks if at least one habitat is selected
+
+            habitatBoxes.forEach(box => {
+                if (box.checked) oneChecked = true;    // if any checkbox is checked then oneChecked = true
+            });
+
+            // stops submission if no habitat is selected
+            if (!oneChecked) {
+                alert("Please select at least ONE habitat.");
+                document.querySelector('.tab[data-target="habitat"]').click();
+                return;
+            }
 
             const tabs = document.querySelectorAll(".tab");
             const sections = document.querySelectorAll(".section");
