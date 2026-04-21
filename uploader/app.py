@@ -143,30 +143,28 @@ def submit_all():
 
     uploaded_files = []
     files = request.files.getlist("file")
+
+    total_files = len([f for f in files if f and f.filename and allowed_file(f.filename)])
+    pad_width = len(str(total_files))
+
+    file_counter = 1
+
     for f in files:
         if f and f.filename and allowed_file(f.filename):
-            # Build renamed filename: {start_date}_{location}_{original_name}
-            start_date = request.form.get("start_date", "unknown-date")
-            location = request.form.get("location", "unknown-location")
-            location_clean = location.strip().lower().replace(" ", "-")
-            original_name = os.path.basename(f.filename)
-            new_filename = f"{start_date}_{location_clean}_{original_name}"
+            ext = os.path.splitext(f.filename)[1].lower()
+            new_filename = str(file_counter).zfill(pad_width) + ext
 
-            # Preserve subfolder structure but use new filename
-            subfolder = os.path.dirname(f.filename)
-            save_path = os.path.join("uploads", subfolder, new_filename) if subfolder else os.path.join("uploads", new_filename)
-
-            os.makedirs(os.path.dirname(save_path) if os.path.dirname(save_path) else "uploads", exist_ok=True)
+            save_path = os.path.join("uploads", new_filename)
             f.save(save_path)
 
-            # Extract EXIF for images
             exif = get_exif_data(save_path)
             uploaded_files.append({
                 "filename": new_filename,
-                "original_filename": original_name,
+                "original_filename": os.path.basename(f.filename),
                 "filepath": save_path,
                 "exif": exif
             })
+            file_counter += 1
 
     # Fall back to form-submitted hidden inputs if session coords not set
     lat = session.get("latitude") or request.form.get("latitude")
