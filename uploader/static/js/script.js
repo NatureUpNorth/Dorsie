@@ -15,8 +15,23 @@
 
 
     <!-- SUBMIT VALIDATION -->
-        document.getElementById("submitAll").addEventListener("click", function (event) {
-            event.preventDefault();
+            document.getElementById("submitAll").addEventListener("click", function (event) {
+            event.preventDefault();      // prevents form from submitting immediately when submit button is clicked
+
+
+            const habitatBoxes = document.querySelectorAll(".habitat-checkbox");
+            let oneChecked = false;       // oneChecked is a flag that tracks if at least one habitat is selected
+
+            habitatBoxes.forEach(box => {
+                if (box.checked) oneChecked = true;    // if any checkbox is checked then oneChecked = true
+            });
+
+            // stops submission if no habitat is selected
+            if (!oneChecked) {
+                alert("Please select at least ONE habitat.");
+                document.querySelector('.tab[data-target="habitat"]').click();
+                return;
+            }
 
             const tabs = document.querySelectorAll(".tab");
             const sections = document.querySelectorAll(".section");
@@ -24,81 +39,132 @@
             let firstInvalidTab = null;
             let formIsValid = true;
 
-            tabs.forEach(tab => tab.classList.remove("error"));
+            tabs.forEach(tab => tab.classList.remove("error"));   // removes red highlighting from tabs before re-checking
 
-            sections.forEach(section => {
+            sections.forEach(section => {           // loops through each section
                 const requiredFields = section.querySelectorAll("[required]");
                 let sectionValid = true;
+                const radioGroups = new Set();
 
                 requiredFields.forEach(field => {
-                    if (!field.value) {
+                    // radio buttons automatically have values assigned to them,
+                    //so I'm grouping them to validate entry and then cheking if one is selected
+
+                    if (field.type === "radio") {
+
+                        // Skip if already checked this group
+                        if (radioGroups.has(field.name)) return;
+                        radioGroups.add(field.name);
+                        const group = document.querySelectorAll(`input[name="${field.name}"]`);
+                        const oneChecked = Array.from(group).some(r => r.checked);
+                            if (!oneChecked) {
+                                sectionValid = false;
+                            }
+                    }
+                    else if (!field.value) {
                         sectionValid = false;
                         formIsValid = false;
                     }
                 });
 
+
+
+
                 if (!sectionValid) {
                     const tab = document.querySelector(`.tab[data-target="${section.id}"]`);
-                    tab.classList.add("error");
+                    tab.classList.add("error");    // highlights the tab with an error red
 
                     if (!firstInvalidTab) firstInvalidTab = tab;
                 }
             });
 
             if (!formIsValid) {
-                firstInvalidTab.click();
+                firstInvalidTab.click();   // automatically opens the first tab with errors
                 return;
             }
 
             event.target.closest("form").submit();
         });
 
-    <!-- AFFILIATION DROPDOWN -->
-        document.addEventListener("DOMContentLoaded", function () {
+    <!-- AFFILIATION RADIO BUTTONS -->
+    
+    document.addEventListener("DOMContentLoaded", function () {
 
-            const affiliationSelect = document.getElementById("affiliation_type");
-            const subContainer = document.getElementById("subAffiliationContainer");
+        const radios = document.querySelectorAll('input[name="affiliation_type"]');
+        const subBox = document.getElementById("subAffiliationBox");
+        const subInput = document.getElementById("sub_affiliation");
 
-            const options = {
-                "University": ["St. Lawrence", "Clarkson", "SUNY Canton"],
-                "School": [
-                    "Canton Central",
-                    "Colton-Pierrepont Central School",
-                    "Little River Community School",
-                    "Massena Central School"
-                ]
-            };
+        function hideSub() {
+            subBox.classList.add("d-none");
+            subInput.value = "";
+            subInput.required = false;
+        }
 
-            affiliationSelect.addEventListener("change", function () {
-                const selected = this.value;
+        radios.forEach(radio => {
+            radio.addEventListener("change", function () {
 
-                if (options[selected]) {
-                    subContainer.innerHTML = `
-                <label class="form-label">Sub-Affiliation</label>
-                <select class="form-select" id="sub_affiliation" name="sub_affiliation" required>
-                    <option value="" disabled selected>Select sub-affiliation</option>
-                </select>
-            `;
-
-                    const sel = document.getElementById("sub_affiliation");
-
-                    options[selected].forEach(opt => {
-                        const o = document.createElement("option");
-                        o.value = opt;
-                        o.textContent = opt;
-                        sel.appendChild(o);
-                    });
+                // Individual volunteer = no extra input
+                if (this.value === "Individual Volunteer") {
+                    hideSub();
                 }
                 else {
-                    subContainer.innerHTML = `
-                <label class="form-label">Sub-Affiliation</label>
-                <input type="text" class="form-control" id="sub_affiliation"
-                       name="sub_affiliation" placeholder="Enter affiliation name" required>
-            `;
+                    subBox.classList.remove("d-none");
+                    subInput.required = true;
                 }
+
+            });
+        });
+
+    });
+
+
+    <!-- AFFILIATION SUGGESTIONS -->
+    
+    const affiliationSuggestions = {
+        University: [
+            "St. Lawrence University",
+            "Clarkson University",
+            "SUNY Canton",
+            "SUNY Potsdam"
+        ],
+
+        School: [
+            "Canton Central School",
+            "Massena Central School",
+            "Colton-Pierrepont Central School",
+            "Norwood-Norfolk Central School",
+            "Potsdam Central School"
+        ],
+
+        Other: [
+            "Nature Up North",
+            "Adirondack Park Agency"
+        ]
+    };
+
+    const affiliationType = document.getElementById("affiliation_type");
+    const datalist = document.getElementById("affiliationSuggestions");
+
+    affiliationType.addEventListener("change", function () {
+
+        const selected = this.value;
+
+        datalist.innerHTML = "";
+
+        if (affiliationSuggestions[selected]) {
+
+            affiliationSuggestions[selected].forEach(name => {
+
+                const option = document.createElement("option");
+                option.value = name;
+
+                datalist.appendChild(option);
+
             });
 
-        });
+        }
+
+    });
 
 
     <!-- HABITAT DROPDOWN -->
@@ -250,3 +316,28 @@
             renderFileList();
             syncInputFiles();
         }
+
+    <!-- CAMERA MODEL -->
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const radios = document.querySelectorAll('input[name="camera_choice"]');
+        const modelBox = document.getElementById("cameraModelBox");
+        const modelInput = document.getElementById("camera_model");
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", function () {
+
+                if (this.value === "not_borrowed") {
+                    modelBox.classList.remove("d-none");
+                    modelInput.required = true;
+                } else {
+                    modelBox.classList.add("d-none");
+                    modelInput.value = "";
+                    modelInput.required = false;
+                }
+
+            });
+        });
+
+    });
