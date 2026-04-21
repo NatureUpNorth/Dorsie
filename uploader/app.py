@@ -6,7 +6,6 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from PIL import Image
 from PIL.ExifTags import TAGS
 
-
 # App Setup
 app = Flask(__name__)
 app.secret_key = "secret"
