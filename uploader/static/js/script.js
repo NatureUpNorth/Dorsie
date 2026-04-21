@@ -86,52 +86,85 @@
             event.target.closest("form").submit();
         });
 
-    <!-- AFFILIATION DROPDOWN -->
-        document.addEventListener("DOMContentLoaded", function () {
+    <!-- AFFILIATION RADIO BUTTONS -->
+    
+    document.addEventListener("DOMContentLoaded", function () {
 
-            const affiliationSelect = document.getElementById("affiliation_type");
-            const subContainer = document.getElementById("subAffiliationContainer");
+        const radios = document.querySelectorAll('input[name="affiliation_type"]');
+        const subBox = document.getElementById("subAffiliationBox");
+        const subInput = document.getElementById("sub_affiliation");
 
-            const options = {
-                "University": ["St. Lawrence", "Clarkson", "SUNY Canton"],
-                "School": [
-                    "Canton Central",
-                    "Colton-Pierrepont Central School",
-                    "Little River Community School",
-                    "Massena Central School"
-                ]
-            };
+        function hideSub() {
+            subBox.classList.add("d-none");
+            subInput.value = "";
+            subInput.required = false;
+        }
 
-            affiliationSelect.addEventListener("change", function () {
-                const selected = this.value;
+        radios.forEach(radio => {
+            radio.addEventListener("change", function () {
 
-                if (options[selected]) {
-                    subContainer.innerHTML = `
-                <label class="form-label">Sub-Affiliation</label>
-                <select class="form-select" id="sub_affiliation" name="sub_affiliation" required>
-                    <option value="" disabled selected>Select sub-affiliation</option>
-                </select>
-            `;
-
-                    const sel = document.getElementById("sub_affiliation");
-
-                    options[selected].forEach(opt => {
-                        const o = document.createElement("option");
-                        o.value = opt;
-                        o.textContent = opt;
-                        sel.appendChild(o);
-                    });
+                // Individual volunteer = no extra input
+                if (this.value === "Individual Volunteer") {
+                    hideSub();
                 }
                 else {
-                    subContainer.innerHTML = `
-                <label class="form-label">Sub-Affiliation</label>
-                <input type="text" class="form-control" id="sub_affiliation"
-                       name="sub_affiliation" placeholder="Enter affiliation name" required>
-            `;
+                    subBox.classList.remove("d-none");
+                    subInput.required = true;
                 }
+
+            });
+        });
+
+    });
+
+
+    <!-- AFFILIATION SUGGESTIONS -->
+    
+    const affiliationSuggestions = {
+        University: [
+            "St. Lawrence University",
+            "Clarkson University",
+            "SUNY Canton",
+            "SUNY Potsdam"
+        ],
+
+        School: [
+            "Canton Central School",
+            "Massena Central School",
+            "Colton-Pierrepont Central School",
+            "Norwood-Norfolk Central School",
+            "Potsdam Central School"
+        ],
+
+        Other: [
+            "Nature Up North",
+            "Adirondack Park Agency"
+        ]
+    };
+
+    const affiliationType = document.getElementById("affiliation_type");
+    const datalist = document.getElementById("affiliationSuggestions");
+
+    affiliationType.addEventListener("change", function () {
+
+        const selected = this.value;
+
+        datalist.innerHTML = "";
+
+        if (affiliationSuggestions[selected]) {
+
+            affiliationSuggestions[selected].forEach(name => {
+
+                const option = document.createElement("option");
+                option.value = name;
+
+                datalist.appendChild(option);
+
             });
 
-        });
+        }
+
+    });
 
 
     <!-- HABITAT DROPDOWN -->
