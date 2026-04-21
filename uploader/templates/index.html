@@ -667,21 +667,29 @@
             sections.forEach(section => {           // loops through each section
                 const requiredFields = section.querySelectorAll("[required]");
                 let sectionValid = true;
+                const radioGroups = new Set();
 
                 requiredFields.forEach(field => {
-                    if (!field.value) {
+                    // radio buttons automatically have values assigned to them,
+                    //so I'm grouping them to validate entry and then cheking if one is selected
+
+                    if (field.type === "radio") {
+
+                        // Skip if already checked this group
+                        if (radioGroups.has(field.name)) return;
+                        radioGroups.add(field.name);
+                        const group = document.querySelectorAll(`input[name="${field.name}"]`);
+                        const oneChecked = Array.from(group).some(r => r.checked);
+                            if (!oneChecked) {
+                                sectionValid = false;
+                            }
+                    }
+                    else if (!field.value) {
                         sectionValid = false;
                         formIsValid = false;
                     }
                 });
 
-                if (!sectionValid) {
-                    const tab = document.querySelector(`.tab[data-target="${section.id}"]`);
-                    tab.classList.add("error");    // highlights the tab with an error red
-
-                    if (!firstInvalidTab) firstInvalidTab = tab;
-                }
-            });
 
             if (!formIsValid) {
                 firstInvalidTab.click();   // automatically opens the first tab with errors
