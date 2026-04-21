@@ -76,13 +76,6 @@ def allowed_file(filename):
 def index():
     return render_template("index.html")
 
-# Location/Map route (not sure if still needed)
-@app.route("/location")
-@login_required
-def location():
-    return render_template("map.html")
-
-
 # Other "routes" (not actual pages)
 
 @app.route("/save_dates", methods=["POST"])
