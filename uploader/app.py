@@ -16,7 +16,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-
 # User Setup and Login (Prototype)
 class User(UserMixin):
     def __init__(self, id):
@@ -27,14 +26,11 @@ class User(UserMixin):
     def get_id(self):
         return self.id
 
-
 users = {"123": User("123")}
-
 
 @login_manager.user_loader
 def load_user(user_id):
     return users.get(user_id)
-
 
 # Login Route
 @app.route("/", methods=["GET", "POST"])
@@ -61,22 +57,23 @@ def login():
     </form>
     """
 
-
 # Allowed File Extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'avi', 'mov'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-# Page Routes
-
-# Main page route
+# Main Page Route
 @app.route("/index")
 @login_required
 def index():
     return render_template("index.html")
 
 # Other "routes" (not actual pages)
+
+@app.route("/location")
+@login_required
+def location():
+    return render_template("map.html")
 
 @app.route("/save_dates", methods=["POST"])
 @login_required
@@ -85,7 +82,6 @@ def save_dates():
     session["end_date"] = request.form.get("end_date")
     return jsonify({"status": "ok"})
 
-
 @app.route("/save_coordinates", methods=["POST"])
 @login_required
 def save_coordinates():
@@ -93,7 +89,6 @@ def save_coordinates():
     session["latitude"] = data.get("latitude")
     session["longitude"] = data.get("longitude")
     return jsonify({"message": "Coordinates saved successfully"}), 200
-
 
 @app.route("/upload_files", methods=["POST"])
 @login_required
@@ -128,7 +123,6 @@ def get_exif_data(filepath):
     except Exception:
         return {}
 
-
 @app.route("/submit_all", methods=["POST"])
 @login_required
 def submit_all():
@@ -138,7 +132,7 @@ def submit_all():
     files = request.files.getlist("file")
 
     total_files = len([f for f in files if f and f.filename and allowed_file(f.filename)])
-    pad_width = len(str(total_files))
+    pad_width = len(str(total_files)) if total_files > 0 else 1
 
     file_counter = 1
 
@@ -196,3 +190,5 @@ def submit_all():
 if __name__ == "__main__":
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
+
+    # test

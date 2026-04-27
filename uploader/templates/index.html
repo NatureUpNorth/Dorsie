@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <title>Nature Up North</title>
-    <!-- Map Configuration -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
     <!-- END Map Configuration -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
 
 <body>
     <h1 class="app-title mt-5">Nature Up North Dorsie Upload</h1>
 
-        <!-- TABS -->
-        <div class="tabs">
-            <div class="tab active" data-target="upload">Upload</div>
-            <div class="tab" data-target="affiliation">Affiliation</div>
-            <div class="tab" data-target="habitat">Habitat</div>
-            <div class="tab" data-target="dates">Date</div>
-            <div class="tab" data-target="location">Location</div>
-            <div class="tab" data-target="submit">Submit</div>
-        </div>
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" data-target="upload">Upload</div>
+        <div class="tab" data-target="affiliation">Affiliation</div>
+        <div class="tab" data-target="habitat">Habitat</div>
+        <div class="tab" data-target="dates">Date</div>
+        <div class="tab" data-target="location">Location</div>
+        <div class="tab" data-target="submit">Submit</div>
+    </div>
 
     <div class="container mt-0">
 
@@ -41,122 +37,65 @@
         {% endwith %}
 
         <!-- All tabs appear in one form, one URL -->
-        <form action="/submit_all" method="POST" enctype="multipart/form-data">
+        <form action="/submit_all" method="POST" enctype="multipart/form-data" id="mainForm">
 
             <!-- Upload Section -->
             <div id="upload" class="section active">
-
                 <h2>Upload Files</h2>
-
-                <!-- Flash messages -->
-                <ul class="flash-messages">
-                    {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                    {% for message in messages %}
-                    <li>{{ message }}</li>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-                </ul>
-
+                
                 <!-- Drag & Drop Area -->
                 <div id="drop-area" class="p-4 mb-3 border border-dashed text-center">
                     <p>Drag & drop your folder here</p>
-
-                    <button type="button" class="btn btn-primary me-2"
-                        onclick="document.getElementById('fileElemFolder').click();">
+                    <button type="button" class="btn btn-primary me-2" onclick="document.getElementById('fileElemFolder').click();">
                         Select Folder
                     </button>
 
                     <!-- Visible folder picker -->
-                    <input type="file" id="fileElemFolder" webkitdirectory directory
-                        accept="image/*,video/*,audio/*" style="display:none;">
-
-                    <!-- Hidden input that actually submits with the form -->
+                    <input type="file" id="fileElemFolder" webkitdirectory directory accept="image/*,video/*,audio/*" style="display:none;">
                     <input type="file" id="fileSubmit" name="file" multiple style="display:none;">
-               </div>
+                </div>
 
                 <!-- File List -->
                 <div id="file-list"></div>
-
-                <br>
-                <div style="display: flex; gap: 20px; align-items:flex-start;">
-                    <button type="button" id="saveFiles"> Save Files </button>
-                    <p id="savefile"></p>
-                    <span id="checkfile" class="checkmark" style="color:green;"></span>
+                
+                <div id="imagePreviewModal" class="preview-modal">
+                    <span class="close-preview">&times;</span>
+                    <img id="previewImage" />
                 </div>
-
             </div>
 
             <!-- Affiliation Section -->
             <div id="affiliation" class="section">
-
                 <h2>Affiliation</h2>
-
-                <p class="mb-3 fw-semibold">
-                    Please choose one option from the following list:
-                    I am working as ...
-                </p>
+                <p class="mb-3 fw-semibold">Please choose one option from the following list: I am working as ...</p>
 
                 <!-- OPTION 1 -->
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio"
-                           name="affiliation_type"
-                           id="affil_volunteer"
-                           value="Individual Volunteer"
-                           required>
-
-                    <label class="form-check-label" for="affil_volunteer">
-                        An individual volunteer from the community
-                    </label>
+                    <input class="form-check-input" type="radio" name="affiliation_type" id="affil_volunteer" value="Individual Volunteer" required>
+                    <label class="form-check-label" for="affil_volunteer">An individual volunteer from the community</label>
                 </div>
 
                 <!-- OPTION 2 -->
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio"
-                           name="affiliation_type"
-                           id="affil_k12"
-                           value="K-12 School">
-
-                    <label class="form-check-label" for="affil_k12">
-                        Part of a team from a local K-12 school
-                    </label>
+                    <input class="form-check-input" type="radio" name="affiliation_type" id="affil_k12" value="K-12 School">
+                    <label class="form-check-label" for="affil_k12">Part of a team from a local K-12 school</label>
                 </div>
 
                 <!-- OPTION 3 -->
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="affiliation_type"
-                           id="affil_college" value="College / University">
-
-                    <label class="form-check-label" for="affil_college">
-                        Part of a team from a local college/university
-                    </label>
+                    <input class="form-check-input" type="radio" name="affiliation_type" id="affil_college" value="College / University">
+                    <label class="form-check-label" for="affil_college">Part of a team from a local college/university</label>
                 </div>
 
                 <!-- OPTION 4 -->
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="affiliation_type"
-                        id="affil_org" value="Community Organization">
-
-                    <label class="form-check-label" for="affil_org">
-                        Part of a team from a community organization
-                    </label>
-
+                    <input class="form-check-input" type="radio" name="affiliation_type" id="affil_org" value="Community Organization">
+                    <label class="form-check-label" for="affil_org">Part of a team from a community organization</label>
                 </div>
                 <!-- Sub-Affiliation Input -->
                 <div id="subAffiliationBox" class="d-none">
-
-                    <label class="form-label">
-                        Please enter the name of your school/organization/college:
-                    </label>
-
-                    <input type="text"
-                           class="form-control"
-                           id="sub_affiliation"
-                           name="sub_affiliation"
-                           placeholder="Enter name here"
-                           list="affiliationSuggestions">
-
+                    <label class="form-label">Please enter the name of your school/organization/college:</label>
+                    <input type="text" class="form-control" id="sub_affiliation" name="sub_affiliation" placeholder="Enter name here" list="affiliationSuggestions">
                     <datalist id="affiliationSuggestions">
                         <option value="SUNY Canton">
                         <option value="SUNY Potsdam">
@@ -168,117 +107,95 @@
                         <option value="Norwood-Norfolk Central School">
                         <option value="Potsdam Central School">
                     </datalist>
-
                 </div>
-
             </div>
 
             <!-- Habitat Section -->
             <div id="habitat" class="section">
                 <h2>Habitat and Urbanization</h2>
-                <div class="form-container"
-                    style="display: flex; justify-content:left; align-items:flex-start; gap:20%;">
+                <div class="form-container" style="display: flex; justify-content:left; align-items:flex-start; gap:20%;">
                     <div id="habitat_type" style="margin-left:5%; width:35%">
-                        <form method="POST">
-                            <!--<h5> Habitat </h5>-->
-                            <p> Which of the following terms would characterize the habitat in the location where the
-                                camera was placed? (check all that apply) </p>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="deciduous forest">
-                                <label for="habitat">Deciduous Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="mixed forest">
-                                <label class="form-check-label">Mixed Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="evergreen forest">
-                                <label class="form-check-label">Evergreen Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="plantation forest">
-                                <label class="form-check-label">Plantation Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="natural field">
-                                <label class="form-check-label">Natural Field or Meadow (Old Field)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat"
-                                    value="agricultural field">
-                                <label class="form-check-label">Agricultural Field</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat"
-                                    value="public park/school grounds">
-                                <label class="form-check-label">Public Park/School Grounds</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="home lawn">
-                                <label class="form-check-label">Home Lawn</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="garden">
-                                <label class="form-check-label">Garden</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="wetland edge">
-                                <label class="form-check-label">Wetland Edge</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat"
-                                    value="edge between two habitats">
-                                <label class="form-check-label">Edge Between Two Habitats</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="other">
-                                <label class="form-check-label">Other</label>
-                            </div>
-                        </form>
+                        <p> Which of the following terms would characterize the habitat in the location where the camera was placed? (check all that apply) </p>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="deciduous forest">
+                            <label for="habitat">Deciduous Forest</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="mixed forest">
+                            <label class="form-check-label">Mixed Forest</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="evergreen forest">
+                            <label class="form-check-label">Evergreen Forest</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="plantation forest">
+                            <label class="form-check-label">Plantation Forest</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="natural field">
+                            <label class="form-check-label">Natural Field or Meadow (Old Field)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="agricultural field">
+                            <label class="form-check-label">Agricultural Field</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="public park/school grounds">
+                            <label class="form-check-label">Public Park/School Grounds</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="home lawn">
+                            <label class="form-check-label">Home Lawn</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="garden">
+                            <label class="form-check-label">Garden</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="wetland edge">
+                            <label class="form-check-label">Wetland Edge</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="edge between two habitats">
+                            <label class="form-check-label">Edge Between Two Habitats</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="other">
+                            <label class="form-check-label">Other</label>
+                        </div>
                     </div>
-
+                    
                     <div id="urbanization_type" style="width:35%">
-                        <form method="POST">
-                            <!--<h5> Urbanization </h5>-->
-                            <p> How urbanized is the location where the camera was placed? </p>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
-                                <label class="form-check-label">Urban</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="urbanization" value="suburban">
-                                <label class="form-check-label">Suburban</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="urbanization" value="rural">
-                                <label class="form-check-label">Rural</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="urbanization" value="wild">
-                                <label class="form-check-label">Wild</label>
-                            </div>
-                        </form>
+                        <!--<h5> Urbanization </h5>-->
+                        <p> How urbanized is the location where the camera was placed? </p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="urbanization" value="urban" required>
+                            <label class="form-check-label">Urban</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="urbanization" value="suburban">
+                            <label class="form-check-label">Suburban</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="urbanization" value="rural">
+                            <label class="form-check-label">Rural</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="urbanization" value="wild">
+                            <label class="form-check-label">Wild</label>
+                        </div>
                     </div>
-                </div>
-
-                <br>
-                <div style="display: flex; gap: 20px; align-items:flex-start;">
-                    <button type=submit id="saveHabitat"> Save Habitat </button>
-                    <p id="savehabi"></p>
-                    <span id="checkhabi" class="checkmark" style="color:green;"></span>
                 </div>
             </div>
-
 
             <!-- Date Section -->
             <div id="dates" class="section">
                 <h2>Deployment Dates</h2>
-
                 <div class="mb-3">
                     <label class="form-label">Start of Camera Deployment</label>
                     <input type="date" id="start_date" name="start_date" class="form-control" required>
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label">End of Camera Deployment</label>
                     <input type="date" id="end_date" name="end_date" class="form-control" required>
@@ -286,29 +203,15 @@
                         ! End date cannot be before start date.
                     </div>
                 </div>
-
-                <br>
-                <div style="display: flex; gap: 20px; align-items:flex-start;">
-                    <button type=submit id="saveDates"> Save Dates </button>
-                    <p id="savedate"></p>
-                    <span id="checkdate" class="checkmark" style="color:green;"></span>
-                </div>
             </div>
-
 
             <!-- Location Section -->
             <div id="location" class="section">
                 <h2>Location</h2>
                 <p>Select the camera deployment location by clicking on the map or search results</p>
                 <div class="search-container">
-                    <input
-                        id="searchInput"
-                        type="text"
-                        class="form-control"
-                        placeholder="Search address or location..."
-                        style="margin-bottom: 10px;">
+                    <input id="searchInput" type="text" class="form-control" placeholder="Search address or location..." style="margin-bottom: 10px;">
                 </div>
-
                 <div class="location-container">
                     <div class="map-section">
                         <div id="map"></div>
@@ -317,18 +220,18 @@
                 </div>
 
                 <!-- Make sure you put this AFTER Leaflet's CSS -->
-                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-                   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-                   crossorigin="">
-                </script>
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
                 <script src="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.js"></script>
 
                 <p id="latlon">Latitude:  Longitude:  </p>
                 <div class="controls-section" style="display: flex; gap: 20px;">
-                    <button type="submit" id="saveCoordinates">SAVE COORDINATES</button>
+                    <button type="button" id="saveCoordinates">SAVE COORDINATES</button>
                     <p id="save"></p>
                     <span id="check" class="checkmark" style="color: green;"></span>
                 </div>
+                
+                <input type="hidden" id="latitude_input" name="latitude">
+                <input type="hidden" id="longitude_input" name="longitude">
             </div>
 
             <script src="{{ url_for('static', filename='js/map.js') }}"></script>
@@ -336,104 +239,39 @@
             <!-- Submit Section -->
             <div id="submit" class="section">
                 <h3 class="mt-4">Camera Information</h3>
-
-                <p>
-                    What number is written on the camera you borrowed from Nature Up North?
-                    <br>
-                    <small>(Choose one, or select the last option if you did not borrow a camera)</small>
-                </p>
+                <p>What number is written on the camera you borrowed from Nature Up North?<br><small>(Choose one, or select the last option if you did not borrow a camera)</small></p>
 
                 <!-- Camera Options -->
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="camera_choice" value="1" required>
-                    <label class="form-check-label">1</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="camera_choice" value="2">
-                    <label class="form-check-label">2</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="camera_choice" value="3">
-                    <label class="form-check-label">3</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="camera_choice" value="4">
-                    <label class="form-check-label">4</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="camera_choice" value="5">
-                    <label class="form-check-label">5</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="camera_choice" value="6">
-                    <label class="form-check-label">6</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="camera_choice" value="7">
-                    <label class="form-check-label">7</label>
-                </div>
-
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="1" required><label class="form-check-label">1</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="2"><label class="form-check-label">2</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="3"><label class="form-check-label">3</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="4"><label class="form-check-label">4</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="5"><label class="form-check-label">5</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="6"><label class="form-check-label">6</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="camera_choice" value="7"><label class="form-check-label">7</label></div>
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio"
-                           name="camera_choice"
-                           value="not_borrowed"
-                           id="notBorrowed">
-                    <label class="form-check-label">
-                        I did not borrow a camera from Nature Up North
-                    </label>
+                    <input class="form-check-input" type="radio" name="camera_choice" value="not_borrowed" id="notBorrowed">
+                    <label class="form-check-label">I did not borrow a camera from Nature Up North</label>
                 </div>
 
                 <!-- Model Input (Hidden Initially) -->
                 <div id="cameraModelBox" class="d-none">
-                    <label class="form-label">
-                        Please enter the model/make of your trail camera:
-                    </label>
-                    <input type="text"
-                           class="form-control"
-                           id="camera_model"
-                           name="camera_model"
-                           placeholder="e.g. Bushnell Core DS">
+                    <label class="form-label">Please enter the model/make of your trail camera:</label>
+                    <input type="text" class="form-control" id="camera_model" name="camera_model" placeholder="e.g. Bushnell Core DS">
                 </div>
-                <h3> Comments and Submission </h3>
+                
+                <h3 class="mt-4"> Comments and Submission </h3>
                 <p>Is there anything else you'd like to share about this submission?:</p>
                 <label for="comment"></label>
-                <textarea id="comment" name="comment" rows="3" cols="60"></textarea>
+                <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
                 <br><br>
                 <button type="submit" id="submitAll">Submit All</button>
             </div>
         </form>
     </div>
 
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
-    <!--CAMERA MODEL -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const radios = document.querySelectorAll('input[name="camera_choice"]');
-            const modelBox = document.getElementById("cameraModelBox");
-            const modelInput = document.getElementById("camera_model");
-
-            radios.forEach(radio => {
-                radio.addEventListener("change", function () {
-                    if (this.value === "not_borrowed") {
-                        modelBox.classList.remove("d-none");
-                        modelInput.required = true;
-                    } else {
-                        modelBox.classList.add("d-none");
-                        modelInput.value = "";
-                        modelInput.required = false;
-                    }
-                });
-            });
-        });
-    </script>
-
 </body>
 
 </html>
