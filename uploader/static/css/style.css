@@ -1,4 +1,5 @@
 /* for the background and body colour */
+<<<<<<< HEAD
         :root {
             --green: #39541e;
             --light-green: #6fa88b;
@@ -247,3 +248,266 @@
             border: 2px solid red !important;
         }
         
+=======
+:root {
+    --green: #39541e;
+    --light-green: #6fa88b;
+    --light-gray: #c0c0c0;
+    --mist-blue: #f0f7fa;
+    --brown: #543b1f;
+    --light-brown: #c9b59a;
+    --blue: #165970;
+    --light-blue: #eaf3f8;
+    --white: #ffffff;
+    --gray: #4a5d51;
+    --dark: #2c2c2c;
+    --light-tint-green: #b9da97;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(to bottom, var(--light-blue), var(--gray));
+    color: var(--dark);
+    margin: 0;
+}
+
+.container {
+    background: var(--white);
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-radius: 0 12px 12px 12px; /* flat top so tabs attach */
+    border-top: none;
+    position: relative;
+    z-index: 1;
+}
+
+.app-title {
+    color: var(--brown);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.tabs {
+    display: flex;
+    gap: 6px;
+    padding-left: 70px;
+    margin-bottom: 2px;
+}
+
+.tab {
+    position: relative;
+    padding: 10px 22px;
+    cursor: pointer;
+    border-radius: 10px 10px 0 0;
+    background: var(--light-green);
+    border: 1px solid #ccc;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    border-bottom: none;
+    top: 6px;
+}
+
+.tab::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: inherit;
+}
+
+.tab:hover {
+    background: var(--green);
+    color: white;
+}
+
+.tab.active {
+    background: var(--white);
+    color: var(--dark);
+    top: 0;
+    z-index: 2;
+    border-bottom: 0px solid var(--white);
+}
+
+.tab.error {
+    border-color: #842029;
+    background: #842029;
+}
+
+.section {
+    display: none;
+    margin-top: 20px;
+}
+
+.section.active {
+    display: block;
+}
+
+button {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--brown);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+/* upload section */
+#drop-area {
+    border: 2px dashed var(--blue);
+    background: var(--mist-blue);
+    padding: 35px;
+    border-radius: 10px;
+    text-align: center;
+    transition: 0.3s ease;
+}
+
+#drop-area.dragover {
+    background: var(--light-gray);
+    border-color: var(--green);
+    color: white;
+}
+
+.flash-messages {
+    color: green;
+    list-style: none;
+    padding-left: 0;
+}
+
+.flash-messages li {
+    margin-bottom: 4px;
+}
+
+#file-list div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+#file-list button {
+    margin-left: 10px;
+}
+
+input, select, textarea {
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 0.15rem rgba(47,111,78,0.25);
+    outline: none;
+}
+
+.preview-modal {
+    display: none;
+    position: fixed;
+    inset: 20%;
+    background: rgba(70, 70, 70, 0.75);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-modal img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.7);
+}
+
+.close-preview {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 32px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.close-preview:hover { color: #ccc; }
+
+.location-container {
+    display: flex;
+    gap: 20px;
+    height: calc(100vh - 350px);
+    min-height: 400px;
+}
+
+.map-section {
+    flex: 1;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.search-container {
+    margin-bottom: 15px;
+}
+
+.results-sidebar {
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    display: none;
+}
+
+.results-sidebar.active {
+    display: block;
+}
+
+.result-item {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.result-item:hover {
+    background-color: #e8f4f8;
+}
+
+.result-item.selected {
+    background-color: #cce5ff;
+    border-left: 4px solid #0066cc;
+    padding-left: 8px;
+}
+
+.result-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.result-address {
+    font-size: 0.85em;
+    color: #666;
+    word-wrap: break-word;
+}
+
+.controls-section {
+    margin-top: 20px;
+    align-items: center;
+}
+>>>>>>> manual_merge

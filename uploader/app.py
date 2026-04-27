@@ -16,7 +16,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-
 # User Setup and Login (Prototype)
 class User(UserMixin):
     def __init__(self, id):
@@ -27,14 +26,11 @@ class User(UserMixin):
     def get_id(self):
         return self.id
 
-
 users = {"123": User("123")}
-
 
 @login_manager.user_loader
 def load_user(user_id):
     return users.get(user_id)
-
 
 # Login Route
 @app.route("/", methods=["GET", "POST"])
@@ -61,16 +57,12 @@ def login():
     </form>
     """
 
-
 # Allowed File Extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'avi', 'mov'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-# Page Routes
-
-# Main page route
+# Main Page Route
 @app.route("/index")
 @login_required
 def index():
@@ -78,13 +70,20 @@ def index():
 
 # Other "routes" (not actual pages)
 
+<<<<<<< HEAD
+=======
+@app.route("/location")
+@login_required
+def location():
+    return render_template("map.html")
+
+>>>>>>> manual_merge
 @app.route("/save_dates", methods=["POST"])
 @login_required
 def save_dates():
     session["start_date"] = request.form.get("start_date")
     session["end_date"] = request.form.get("end_date")
     return jsonify({"status": "ok"})
-
 
 @app.route("/save_coordinates", methods=["POST"])
 @login_required
@@ -93,7 +92,6 @@ def save_coordinates():
     session["latitude"] = data.get("latitude")
     session["longitude"] = data.get("longitude")
     return jsonify({"message": "Coordinates saved successfully"}), 200
-
 
 @app.route("/upload_files", methods=["POST"])
 @login_required
@@ -127,7 +125,10 @@ def get_exif_data(filepath):
         return readable
     except Exception:
         return {}
+<<<<<<< HEAD
 
+=======
+>>>>>>> manual_merge
 
 @app.route("/submit_all", methods=["POST"])
 @login_required
@@ -138,7 +139,11 @@ def submit_all():
     files = request.files.getlist("file")
 
     total_files = len([f for f in files if f and f.filename and allowed_file(f.filename)])
+<<<<<<< HEAD
     pad_width = len(str(total_files))
+=======
+    pad_width = len(str(total_files)) if total_files > 0 else 1
+>>>>>>> manual_merge
 
     file_counter = 1
 
