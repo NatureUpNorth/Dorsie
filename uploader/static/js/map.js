@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 
                 const latlon = document.getElementById("latlon");
                 const resultsSidebar = document.getElementById("resultsSidebar");
