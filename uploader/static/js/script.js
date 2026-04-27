@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <!-- JS for Tabs-->
 
     <!-- TAB SWITCHING -->
