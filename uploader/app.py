@@ -70,14 +70,11 @@ def index():
 
 # Other "routes" (not actual pages)
 
-<<<<<<< HEAD
-=======
 @app.route("/location")
 @login_required
 def location():
     return render_template("map.html")
 
->>>>>>> manual_merge
 @app.route("/save_dates", methods=["POST"])
 @login_required
 def save_dates():
@@ -125,10 +122,6 @@ def get_exif_data(filepath):
         return readable
     except Exception:
         return {}
-<<<<<<< HEAD
-
-=======
->>>>>>> manual_merge
 
 @app.route("/submit_all", methods=["POST"])
 @login_required
@@ -139,11 +132,7 @@ def submit_all():
     files = request.files.getlist("file")
 
     total_files = len([f for f in files if f and f.filename and allowed_file(f.filename)])
-<<<<<<< HEAD
-    pad_width = len(str(total_files))
-=======
     pad_width = len(str(total_files)) if total_files > 0 else 1
->>>>>>> manual_merge
 
     file_counter = 1
 

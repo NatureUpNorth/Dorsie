@@ -8,26 +8,11 @@
 
     <!-- END Map Configuration -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<<<<<<< HEAD
-
-=======
->>>>>>> manual_merge
 </head>
 
 <body>
     <h1 class="app-title mt-5">Nature Up North Dorsie Upload</h1>
 
-<<<<<<< HEAD
-        <!-- TABS -->
-        <div class="tabs">
-            <div class="tab active" data-target="upload">Upload</div>
-            <div class="tab" data-target="affiliation">Affiliation</div>
-            <div class="tab" data-target="habitat">Habitat</div>
-            <div class="tab" data-target="dates">Date</div>
-            <div class="tab" data-target="location">Location</div>
-            <div class="tab" data-target="submit">Submit</div>
-        </div>
-=======
     <!-- TABS -->
     <div class="tabs">
         <div class="tab active" data-target="upload">Upload</div>
@@ -37,7 +22,6 @@
         <div class="tab" data-target="location">Location</div>
         <div class="tab" data-target="submit">Submit</div>
     </div>
->>>>>>> manual_merge
 
     <div class="container mt-0">
 
@@ -67,18 +51,9 @@
                     </button>
 
                     <!-- Visible folder picker -->
-<<<<<<< HEAD
-                    <input type="file" id="fileElemFolder" webkitdirectory directory
-                        accept="image/*,video/*,audio/*" style="display:none;">
-
-                    <!-- Hidden input that actually submits with the form -->
-                    <input type="file" id="fileSubmit" name="file" multiple style="display:none;">
-               </div>
-=======
                     <input type="file" id="fileElemFolder" webkitdirectory directory accept="image/*,video/*,audio/*" style="display:none;">
                     <input type="file" id="fileSubmit" name="file" multiple style="display:none;">
                 </div>
->>>>>>> manual_merge
 
                 <!-- File List -->
                 <div id="file-list"></div>
@@ -140,64 +115,6 @@
                 <h2>Habitat and Urbanization</h2>
                 <div class="form-container" style="display: flex; justify-content:left; align-items:flex-start; gap:20%;">
                     <div id="habitat_type" style="margin-left:5%; width:35%">
-<<<<<<< HEAD
-                        <form method="POST">
-                            <!--<h5> Habitat </h5>-->
-                            <p> Which of the following terms would characterize the habitat in the location where the
-                                camera was placed? (check all that apply) </p>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="deciduous forest">
-                                <label for="habitat">Deciduous Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="mixed forest">
-                                <label class="form-check-label">Mixed Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="evergreen forest">
-                                <label class="form-check-label">Evergreen Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="plantation forest">
-                                <label class="form-check-label">Plantation Forest</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="natural field">
-                                <label class="form-check-label">Natural Field or Meadow (Old Field)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat"
-                                    value="agricultural field">
-                                <label class="form-check-label">Agricultural Field</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat"
-                                    value="public park/school grounds">
-                                <label class="form-check-label">Public Park/School Grounds</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="home lawn">
-                                <label class="form-check-label">Home Lawn</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="garden">
-                                <label class="form-check-label">Garden</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="wetland edge">
-                                <label class="form-check-label">Wetland Edge</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat"
-                                    value="edge between two habitats">
-                                <label class="form-check-label">Edge Between Two Habitats</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="other">
-                                <label class="form-check-label">Other</label>
-                            </div>
-                        </form>
-=======
                         <p> Which of the following terms would characterize the habitat in the location where the camera was placed? (check all that apply) </p>
                         <div class="form-check">
                             <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="deciduous forest">
@@ -247,7 +164,6 @@
                             <input class="form-check-input habitat-checkbox" type="checkbox" name="habitat" value="other">
                             <label class="form-check-label">Other</label>
                         </div>
->>>>>>> manual_merge
                     </div>
                     
                     <div id="urbanization_type" style="width:35%">
@@ -294,19 +210,8 @@
                 <h2>Location</h2>
                 <p>Select the camera deployment location by clicking on the map or search results</p>
                 <div class="search-container">
-<<<<<<< HEAD
-                    <input
-                        id="searchInput"
-                        type="text"
-                        class="form-control"
-                        placeholder="Search address or location..."
-                        style="margin-bottom: 10px;">
-                </div>
-
-=======
                     <input id="searchInput" type="text" class="form-control" placeholder="Search address or location..." style="margin-bottom: 10px;">
                 </div>
->>>>>>> manual_merge
                 <div class="location-container">
                     <div class="map-section">
                         <div id="map"></div>
@@ -315,24 +220,11 @@
                 </div>
 
                 <!-- Make sure you put this AFTER Leaflet's CSS -->
-<<<<<<< HEAD
-                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-                   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-                   crossorigin="">
-                </script>
-=======
                 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
->>>>>>> manual_merge
                 <script src="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.js"></script>
 
                 <p id="latlon">Latitude:  Longitude:  </p>
                 <div class="controls-section" style="display: flex; gap: 20px;">
-<<<<<<< HEAD
-                    <button type="submit" id="saveCoordinates">SAVE COORDINATES</button>
-                    <p id="save"></p>
-                    <span id="check" class="checkmark" style="color: green;"></span>
-                </div>
-=======
                     <button type="button" id="saveCoordinates">SAVE COORDINATES</button>
                     <p id="save"></p>
                     <span id="check" class="checkmark" style="color: green;"></span>
@@ -340,10 +232,7 @@
                 
                 <input type="hidden" id="latitude_input" name="latitude">
                 <input type="hidden" id="longitude_input" name="longitude">
->>>>>>> manual_merge
             </div>
-
-            <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 
             <!-- Submit Section -->
             <div id="submit" class="section">
@@ -368,53 +257,19 @@
                     <label class="form-label">Please enter the model/make of your trail camera:</label>
                     <input type="text" class="form-control" id="camera_model" name="camera_model" placeholder="e.g. Bushnell Core DS">
                 </div>
-<<<<<<< HEAD
-                <h3> Comments and Submission </h3>
-                <p>Is there anything else you'd like to share about this submission?:</p>
-                <label for="comment"></label>
-                <textarea id="comment" name="comment" rows="3" cols="60"></textarea>
-=======
                 
                 <h3 class="mt-4"> Comments and Submission </h3>
                 <p>Is there anything else you'd like to share about this submission?:</p>
                 <label for="comment"></label>
                 <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
->>>>>>> manual_merge
                 <br><br>
                 <button type="submit" id="submitAll">Submit All</button>
             </div>
         </form>
     </div>
 
-<<<<<<< HEAD
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
-    <!--CAMERA MODEL -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const radios = document.querySelectorAll('input[name="camera_choice"]');
-            const modelBox = document.getElementById("cameraModelBox");
-            const modelInput = document.getElementById("camera_model");
-
-            radios.forEach(radio => {
-                radio.addEventListener("change", function () {
-                    if (this.value === "not_borrowed") {
-                        modelBox.classList.remove("d-none");
-                        modelInput.required = true;
-                    } else {
-                        modelBox.classList.add("d-none");
-                        modelInput.value = "";
-                        modelInput.required = false;
-                    }
-                });
-            });
-        });
-    </script>
-
-=======
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
->>>>>>> manual_merge
 </body>
 
 </html>
