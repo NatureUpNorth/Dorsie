@@ -68,9 +68,13 @@
                         Select Folder
                     </button>
 
-                    <input type="file" id="fileElemFolder" name="file" webkitdirectory directory
-                        accept="image/*,video/*,audio/*" style="display: none;" onchange="handleFiles(this.files)">
-                </div>
+                    <!-- Visible folder picker -->
+                    <input type="file" id="fileElemFolder" webkitdirectory directory
+                        accept="image/*,video/*,audio/*" style="display:none;">
+
+                    <!-- Hidden input that actually submits with the form -->
+                    <input type="file" id="fileSubmit" name="file" multiple style="display:none;">
+               </div>
 
                 <!-- File List -->
                 <div id="file-list"></div>
@@ -408,6 +412,27 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
+    <!--CAMERA MODEL -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const radios = document.querySelectorAll('input[name="camera_choice"]');
+            const modelBox = document.getElementById("cameraModelBox");
+            const modelInput = document.getElementById("camera_model");
+
+            radios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    if (this.value === "not_borrowed") {
+                        modelBox.classList.remove("d-none");
+                        modelInput.required = true;
+                    } else {
+                        modelBox.classList.add("d-none");
+                        modelInput.value = "";
+                        modelInput.required = false;
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 

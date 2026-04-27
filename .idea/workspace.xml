@@ -5,24 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b26aaa92-24b7-40e5-8d8b-43b199163b3e" name="Changes" comment="delete unnecessary files">
-      <change afterPath="$PROJECT_DIR$/uploader/static/css/style.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploader/static/js/map.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploader/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/uploader/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uploader/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/uploader/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploader/templates/indexcopy.html" beforeDir="false" afterPath="$PROJECT_DIR$/uploader/templates/indexcopy.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploader/templates/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/uploader/static/js/script.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/keadyazzam/PycharmProjects/Dorsie" value="34cXgEoCgxbf1vi3fIM4orOmv6k" />
+    </persistenceIdMap>
+  </component>
   <component name="CopilotUserSelectedModel">
     <selectedModels>
+      <entry key="edit-panel" value="GPT-5 mini" />
       <entry key="chat-panel" value="GPT-5 mini" />
       <entry key="agent-panel" value="GPT-5 mini" />
-      <entry key="edit-panel" value="GPT-5 mini" />
     </selectedModels>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -62,7 +62,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/NatureUpNorth/Dorsie.git&quot;,
-    &quot;accountId&quot;: &quot;e4b6c110-c658-4658-9fad-fdd6570415c0&quot;
+    &quot;accountId&quot;: &quot;41648c40-fdad-409d-985d-e6031554db4c&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -84,10 +84,14 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.app.executor": "Run",
     "Python.mapTest.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "cleanup",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/keadyazzam/PycharmProjects/Dorsie/uploader/static/js",
     "node.js.detected.package.eslint": "true",
@@ -95,7 +99,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "vcs.Git",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
@@ -139,8 +143,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-PY-252.26199.168" />
-        <option value="bundled-python-sdk-b3d66beaba9a-c6efb3732140-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26199.168" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.31033.139" />
+        <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
       </set>
     </attachedChunks>
   </component>
@@ -159,6 +163,7 @@
       <workItem from="1763069294766" duration="4246000" />
       <workItem from="1763318629534" duration="717000" />
       <workItem from="1763319628820" duration="10335000" />
+      <workItem from="1776804854492" duration="331000" />
     </task>
     <task id="LOCAL-00001" summary="Map changes">
       <option name="closed" value="true" />
@@ -244,6 +249,14 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Dorsie$mapTest.coverage" NAME="mapTest Coverage Results" MODIFIED="1762228821933" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/uploader" />
-    <SUITE FILE_PATH="coverage/Dorsie$app.coverage" NAME="app Coverage Results" MODIFIED="1776725109504" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/uploader" />
+    <SUITE FILE_PATH="coverage/Dorsie$app.coverage" NAME="app Coverage Results" MODIFIED="1776805113994" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/uploader" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>
