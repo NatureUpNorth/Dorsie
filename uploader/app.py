@@ -16,7 +16,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# User Setup and Login (Prototype)
+# User Setup and Login (Prototype
 class User(UserMixin):
     def __init__(self, id):
         self.id = id

@@ -8,7 +8,7 @@ document.querySelectorAll(".tab").forEach(tab => {
 
         document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
         document.getElementById(tab.dataset.target).classList.add("active");
-        
+
         if (typeof map !== 'undefined') {
             map.invalidateSize(); //necessary to ensure map tiles show up properly on location tab
         }
@@ -41,7 +41,7 @@ document.getElementById("submitAll").addEventListener("click", function (event) 
 
     tabs.forEach(tab => tab.classList.remove("error")); // removes red highlighting from tabs before re-checking
 
-    sections.forEach(section => { 
+    sections.forEach(section => {
         const requiredFields = section.querySelectorAll("[required]");
         let sectionValid = true;
         const radioGroups = new Set();
@@ -70,7 +70,7 @@ document.getElementById("submitAll").addEventListener("click", function (event) 
         if (!sectionValid) {
             const tab = document.querySelector(`.tab[data-target="${section.id}"]`);
             if (tab) {
-                tab.classList.add("error"); 
+                tab.classList.add("error");
                 if (!firstInvalidTab) firstInvalidTab = tab;
             }
         }
@@ -136,6 +136,28 @@ const fileList = document.getElementById('file-list');
 const folderInput = document.getElementById('fileElemFolder');
 let filesToUpload = [];
 
+// Remove all button for all images
+const removeAllBtn = document.createElement('button');
+removeAllBtn.type = 'button';
+removeAllBtn.textContent = 'Remove All';
+removeAllBtn.className = 'btn btn-sm btn-outline-danger mb-2';
+removeAllBtn.style.display = 'none';
+removeAllBtn.style.float = 'right';
+fileList.style.marginTop = '55px'; // drop down file list a little
+
+removeAllBtn.onclick = () => {
+    if (!confirm(`Remove all ${filesToUpload.length} files?`)) return;
+
+    filesToUpload = [];
+    folderInput.value = "";
+
+    syncInputFiles();
+    renderFileList();
+};
+
+// Insert button above file list
+fileList.parentNode.insertBefore(removeAllBtn, fileList);
+
 dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
 dropArea.addEventListener('dragleave', e => { e.preventDefault(); dropArea.classList.remove('dragover'); });
 dropArea.addEventListener('drop', e => {
@@ -171,6 +193,11 @@ function traverseFileTree(entry, path = "") {
 
 function renderFileList() {
     fileList.innerHTML = '';
+
+    // Show remove all button only when image list exists
+    removeAllBtn.style.display =
+        filesToUpload.length > 0 ? 'inline-block' : 'none';
+
     filesToUpload.forEach((f, idx) => {
         const row = document.createElement('div');
         row.className = "mb-1";
@@ -187,6 +214,7 @@ function renderFileList() {
             previewBtn.onclick = () => previewImage(f);
         }
 
+        // Remove buttons for individual images
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
         removeBtn.textContent = 'Remove';
@@ -201,7 +229,7 @@ function renderFileList() {
         buttonGroup.className = "file-buttons d-flex align-items-center";
         if (previewBtn) buttonGroup.appendChild(previewBtn);
         buttonGroup.appendChild(removeBtn);
-        
+
         row.appendChild(name);
         row.appendChild(buttonGroup);
         fileList.appendChild(row);
