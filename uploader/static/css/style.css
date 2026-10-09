@@ -20,6 +20,17 @@ body {
     color: var(--dark);
     margin: 0;
 }
+body {
+    min-height: 100vh;
+    background: linear-gradient(
+        to bottom,
+        #e3edf0 0%,
+        #aabbb9 45%,
+        #455e52 100%
+    );
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
 
 .container {
     background: var(--white);
@@ -28,7 +39,15 @@ body {
     border-radius: 0 12px 12px 12px; /* flat top so tabs attach */
     border-top: none;
     position: relative;
+    left: -32px;
+    width: calc(100% + 70px);
     z-index: 1;
+    min-height: 60vh;
+    box-sizing: border-box;
+}
+.container {
+    min-height: 60vh;
+    box-sizing: border-box;
 }
 
 .app-title {
