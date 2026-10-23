@@ -1,3 +1,96 @@
+
+/* Nature Up North brand headings */
+.app-title {
+    text-align: center;
+    font-family: "Roadgeek 2005 New Parks", sans-serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    margin: 20px 0 4px;
+    line-height: 1.15;
+}
+
+.title-nature {
+    color: #543b1f;
+}
+
+.title-up-north {
+    color: #39541e;
+    margin-left: 0.09em;
+}
+
+.app-subtitle {
+    text-align: center;
+    font-family: "Roadgeek 2005 New Parks", sans-serif;
+    font-weight: 700;
+    font-size: 1.45rem;
+    color: #165970;
+    margin: 0 0 26px;
+}
+/* Branding panel above the uploader tabs */
+.app-title,
+.app-subtitle {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* Title and instructions panel */
+.branding-header {
+    margin-top: 20px;
+    margin-bottom: 24px;
+    padding: 18px 24px 20px;
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    text-align: center;
+}
+.branding-header,
+.container.mt-0 {
+    width: calc(100% - 30px);
+    max-width: 1140px;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Main Nature Up North heading */
+.branding-header .app-title {
+    margin: 0 0 8px;
+}
+
+/* Dorsie subtitle */
+.branding-header .app-subtitle {
+    margin: 0;
+    color: #165970;
+}
+
+/* Instructions below the subtitle */
+.branding-header .app-description {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+
+    margin: 14px auto 0;
+    padding-top: 12px;
+    border-top: 1px solid rgba(84, 59, 31, 0.22);
+
+    color: #543b1f;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    text-align: center;
+}
+
+
+/* implementing the official NUN font */
+@font-face {
+    font-family: "Roadgeek 2005 New Parks";
+    src: url("../fonts/roadgeek-2005-new-parks.otf") format("opentype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+
 /* for the background and body colour */
 :root {
     --green: #39541e;
@@ -46,6 +139,17 @@ body {
     box-sizing: border-box;
 }
 .container {
+    background: var(--white);
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 0 12px 12px 12px;
+    border-top: none;
+    position: relative;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    left: 0;
+    z-index: 1;
     min-height: 60vh;
     box-sizing: border-box;
 }
@@ -59,9 +163,14 @@ body {
 
 .tabs {
     display: flex;
-    gap: 6px;
-    padding-left: 70px;
-    margin-bottom: 2px;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 4px;
+    flex-wrap: wrap;
+    width: calc(100% - 30px);
+    max-width: 1140px;
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 
 .tab {
@@ -101,8 +210,8 @@ body {
 }
 
 .tab.error {
-    border-color: #842029;
-    background: #842029;
+    border-color: #ff3333;
+    background: #ff3333;
 }
 
 .section {
@@ -123,6 +232,31 @@ button {
     font-weight: 500;
     transition: 0.2s;
     cursor: pointer;
+}
+
+/* for the tabs to be arrow shaped */
+.tabs .tab {
+    width: 125px;
+    height: 42px;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    clip-path: polygon(
+        0 0,
+        calc(100% - 18px) 0,
+        100% 50%,
+        calc(100% - 18px) 100%,
+        0 100%
+    );
+
+    border-radius: 0;
+    padding: 0 22px 0 10px;
+    margin: 0;
+    flex-shrink: 0;
+    text-align: center;
 }
 
 button:hover {
@@ -278,4 +412,13 @@ input:focus, select:focus, textarea:focus {
 .controls-section {
     margin-top: 20px;
     align-items: center;
+}
+
+body {
+    background-image: url("../images/NUNdorsie.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
 }
