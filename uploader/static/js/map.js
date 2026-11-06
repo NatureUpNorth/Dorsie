@@ -7,6 +7,25 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+// --- Load and draw St. Lawrence County boundary polygon ---
+fetch('https://nominatim.openstreetmap.org/search?county=St.+Lawrence+County&state=New+York&polygon_geojson=1&format=json')
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.length > 0) {
+            L.geoJSON(data[0].geojson, {
+                style: {
+                    color: '#1a5276',      // Border color
+                    weight: 2.5,           // Border thickness
+                    fillColor: '#3388ff',  // Fill color
+                    fillOpacity: 0.15      // Transparent fill
+                }
+            })
+            .bindTooltip("St. Lawrence County, NY")
+            .addTo(map);
+        }
+    })
+    .catch(err => console.error("Error loading county polygon:", err));
+
 var marker = L.marker();
 var lat;
 var lan;
@@ -29,8 +48,31 @@ function searchAddress() {
     save.textContent = " not saved";
     save.style.color = "black";
 
+
+    // For filtering of search to favor canton
+    // target center point (canton)
+    /*const targetLat = 44.5955087138097;
+    const targetLon = -75.17103195190431;
+
+    // Define a "span" in degrees for the bounding box
+    const spanLat = 1.5; // Covers south to Lake George/Gloversville
+    const spanLon = 1.8; // Longitude degrees are shorter here; 1.8 gets us east to Lake Champlain
+
+    // 3. Calculate the bounding box edges
+    const minLon = targetLon - spanLon; // West edge (Lake Ontario)
+    const maxLat = targetLat + spanLat; // North edge (Ottawa/Canada)
+    const maxLon = targetLon + spanLon; // East edge (Lake Champlain/VT border)
+    const minLat = targetLat - spanLat; // South edge (Gloversville/Saratoga)*/
+
+    // Create the viewbox to filter search results: <min_longitude>,<max_latitude>,<max_longitude>,<min_latitude>
+    const viewbox = "-75.8000,45.0000,-74.5000,44.1000";
+
+
+    // Construct the URL
+    const apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}&limit=8&viewbox=${viewbox}`;
+
     // Call Nominatim API
-    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(searchInput) + '&limit=8')
+    fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
             if (data && data.length > 0) {
