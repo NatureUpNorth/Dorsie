@@ -1,7 +1,9 @@
 import os
 import json
+from datetime import datetime
 from flask import Flask, render_template, request, flash, session, jsonify, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
+from werkzeug.utils import secure_filename
 
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -62,6 +64,23 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'avi', 'mov'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def create_upload_directory(affiliation_type, sub_affiliation):
+    affiliation_folder = secure_filename((affiliation_type or "").strip()) or "Unspecified_Affiliation"
+    if affiliation_type == "Individual Volunteer":
+        individual_folder = "Individual"
+    else:
+        individual_folder = secure_filename((sub_affiliation or "").strip()) or "Unspecified"
+
+    upload_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+    upload_directory = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        affiliation_folder,
+        individual_folder,
+        upload_time
+    )
+    os.makedirs(upload_directory, exist_ok=False)
+    return upload_directory
+
 # Main Page Route
 @app.route("/index")
 @login_required
@@ -94,14 +113,20 @@ def save_coordinates():
 @login_required
 def upload_files():
     files = request.files.getlist("file")
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    upload_directory = create_upload_directory(
+        request.form.get("affiliation_type"),
+        request.form.get("sub_affiliation")
+    )
 
     saved_files = []
     for f in files:
         if f and allowed_file(f.filename):
-            path = os.path.join(app.config["UPLOAD_FOLDER"], f.filename)
+            filename = secure_filename(f.filename)
+            if not filename:
+                continue
+            path = os.path.join(upload_directory, filename)
             f.save(path)
-            saved_files.append(f.filename)
+            saved_files.append(filename)
 
     session["files"] = saved_files
     return jsonify({"status": "ok", "files": saved_files})
@@ -126,7 +151,10 @@ def get_exif_data(filepath):
 @app.route("/submit_all", methods=["POST"])
 @login_required
 def submit_all():
-    os.makedirs("uploads", exist_ok=True)
+    upload_directory = create_upload_directory(
+        request.form.get("affiliation_type"),
+        request.form.get("sub_affiliation")
+    )
 
     uploaded_files = []
     files = request.files.getlist("file")
@@ -141,7 +169,7 @@ def submit_all():
             ext = os.path.splitext(f.filename)[1].lower()
             new_filename = str(file_counter).zfill(pad_width) + ext
 
-            save_path = os.path.join("uploads", new_filename)
+            save_path = os.path.join(upload_directory, new_filename)
             f.save(save_path)
 
             exif = get_exif_data(save_path)
@@ -181,7 +209,7 @@ def submit_all():
         "uploaded_files": uploaded_files
     }
 
-    with open("uploads/record.json", "w") as f:
+    with open(os.path.join(upload_directory, "record.json"), "w") as f:
         json.dump(record, f, indent=4)
 
     flash("All data submitted successfully!")
